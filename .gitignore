@@ -204,6 +204,16 @@ cython_debug/
 # .vscode/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
+.DS_Store
+
+# Project-local datasets and generated artifacts
+data/
+outputs/features/*
+!outputs/features/.gitkeep
+outputs/checkpoints/*
+!outputs/checkpoints/.gitkeep
+outputs/results/*
+!outputs/results/.gitkeep
 
 # Ruff stuff:
 .ruff_cache/
@@ -218,3 +228,4 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+outputs/model_cache/
