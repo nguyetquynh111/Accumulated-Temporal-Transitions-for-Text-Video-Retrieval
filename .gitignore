@@ -207,7 +207,7 @@ tempCodeRunnerFile.py
 .DS_Store
 
 # Project-local datasets and generated artifacts
-data/
+/data/
 outputs/features/*
 !outputs/features/.gitkeep
 outputs/checkpoints/*
