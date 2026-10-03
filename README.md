@@ -1,0 +1,1 @@
+# Accumulated-Temporal-Transitions-for-Text-Video-Retrieval
