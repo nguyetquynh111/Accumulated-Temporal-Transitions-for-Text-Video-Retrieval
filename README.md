@@ -1,8 +1,7 @@
 # Accumulated Temporal Transitions for Text-Video Retrieval
 
 This project explores text-to-video retrieval on Something-Something V2 using
-ordered video frames and their temporal transitions. Feature extraction is
-available now; training and evaluation are still in progress.
+ordered video frames and their temporal transitions.
 
 ## Install
 
@@ -41,6 +40,34 @@ For a quick check without downloading model weights:
 python -m src.models.transition_model.pipelines.extract_features \
   --encoder mock --limit 2 --output-dir outputs/features/mock
 ```
+
+Extract features for every split you train or evaluate on (pass
+`--annotations data/annotations/val.jsonl`, and likewise for `test.jsonl`).
+
+## Train the transition model
+
+```bash
+python -m src.models.transition_model.pipelines.train
+```
+
+This reads `train.jsonl` and `val.jsonl`, trains on cached features in
+`outputs/features/vjepa/`, and keeps the checkpoint with the best validation MRR
+at `outputs/checkpoints/transition_model_best.pt`. Per-epoch loss and
+validation metrics go to `outputs/checkpoints/train_log.jsonl`. Add
+`--no-query-conditioning` to train the reranker ablation, and `--limit 200` for
+a quick run on a small subset.
+
+## Evaluate
+
+```bash
+python -m src.models.transition_model.pipelines.evaluate
+```
+
+This scores `test.jsonl` and writes `outputs/results/transition_model_full.json`
+with Recall@1/5/10, MRR, and mAP. Hard-negative metrics are added when
+`data/annotations/hard_negatives.jsonl` exists. Add
+`--transition-dir outputs/features/transitions` to also save per-video
+transition caches.
 
 Run tests with `python -m pytest`. See [Tickets](docs/Tickets.md) for interfaces,
 [PRD](docs/PRD.md) for project details, and [Owners](docs/OWNERS.md) for team responsibilities.
