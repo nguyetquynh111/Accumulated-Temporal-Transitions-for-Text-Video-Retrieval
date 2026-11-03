@@ -69,5 +69,39 @@ with Recall@1/5/10, MRR, and mAP. Hard-negative metrics are added when
 `--transition-dir outputs/features/transitions` to also save per-video
 transition caches.
 
+## Baselines, ablations, and error analysis
+
+Every runner below scores `test.jsonl`, writes metrics to
+`outputs/results/<model>.json`, and writes per-query rankings to
+`outputs/results/rankings_<model>.jsonl` for error analysis.
+
+CLIP frame averaging (B1, zero-shot; caches features in `outputs/features/clip/`):
+
+```bash
+python -m src.models.baselines.clip_baseline
+```
+
+V-JEPA baseline and transition ablations. Each variant trains the shared
+retrieval model on a different view of the cached V-JEPA states, then evaluates
+it. `pooled` is the V-JEPA baseline without transitions (B2), and
+`all_ablations` runs `no_transition`, `mean_transition`, `final_minus_initial`,
+and `full_transition_without_query_conditioning` (B3):
+
+```bash
+python -m src.models.baselines.vjepa_baseline --variant pooled all_ablations
+```
+
+To write rankings for the main model, evaluate its checkpoint with
+`--variant full_transition` (it reads
+`outputs/checkpoints/transition_model_best.pt` by default and skips training).
+Pass `--checkpoint <path>` to evaluate any other saved variant without
+retraining.
+
+Categorize retrieval failures, compare models, and save example figures:
+
+```bash
+python -m src.models.baselines.error_analysis --figure-dir outputs/results/qualitative
+```
+
 Run tests with `python -m pytest`. See [Tickets](docs/Tickets.md) for interfaces,
 [PRD](docs/PRD.md) for project details, and [Owners](docs/OWNERS.md) for team responsibilities.
