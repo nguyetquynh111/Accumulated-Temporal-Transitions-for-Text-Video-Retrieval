@@ -25,6 +25,59 @@ Each line in the annotation file is a JSON object, for example:
 `video_path` is relative to the repository root. The local `data/` directory
 is ignored by Git.
 
+## Reproduce the SSv2 Dataset Splits
+
+We use the official Something-Something V2 (SSv2) training and validation metadata to create reproducible train, validation, and test splits.
+
+The official training set is preserved. The labeled official validation set is divided equally into validation and test subsets using random seed 42. The official hidden-label test set is not used.
+
+### 1. Download the metadata
+
+Obtain the official SSv2 metadata through an authorized source and place the following files in `data/raw_metadata/`:
+
+* `train.json`
+* `validation.json`
+
+The original filenames, `something-something-v2-train.json` and `something-something-v2-validation.json`, are also supported.
+
+### 2. Generate the annotations
+
+Run the following command from the repository root:
+
+```bash
+python -m src.data.prepare_data --raw-metadata data/raw_metadata --seed 42
+```
+
+The script generates:
+
+| File                           | Number of samples |
+| ------------------------------ | ----------------: |
+| `data/annotations/train.jsonl` |           168,913 |
+| `data/annotations/val.jsonl`   |            12,388 |
+| `data/annotations/test.jsonl`  |            12,389 |
+
+These counts correspond to the official SSv2 metadata used for our project.
+
+### 3. Load the annotations
+
+The generated files follow the shared annotation schema and can be loaded using:
+
+```python
+from pathlib import Path
+from src.data.dataset import load_annotations
+
+train = load_annotations(Path("data/annotations/train.jsonl"))
+val = load_annotations(Path("data/annotations/val.jsonl"))
+test = load_annotations(Path("data/annotations/test.jsonl"))
+```
+
+The splitting procedure sorts the original validation entries by video ID before applying the seeded random permutation. This ensures that team members using the same official metadata and seed obtain identical splits.
+
+The generated annotations reference video files under `data/videos/` by default. The corresponding SSv2 videos must be obtained separately to run video-based models.
+
+**Note:** The `data/` directory is excluded from Git. Team members must generate their annotation files locally from authorized official metadata.
+
+
 ## Extract video features
 
 ```bash
