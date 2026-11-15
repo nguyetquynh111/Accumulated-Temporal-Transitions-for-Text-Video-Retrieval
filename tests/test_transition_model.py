@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 import torch
 
-from src.eval.evaluate import split_rows_by_negative_type
+from src.eval.candidate_metrics import split_rows_by_negative_type
 from src.models.transition_model.encoder import save_video_feature_cache
 from src.models.transition_model.pipelines.evaluate import evaluate_transition_model
 from src.models.transition_model.pipelines.train import (
@@ -287,3 +287,83 @@ class TransitionModelTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TokenMatcherTests(unittest.TestCase):
+    def test_state_only_tokens_keep_every_state_with_zero_transitions(self):
+        states = np.array([[0, 0], [1, 2], [4, 4]], dtype=np.float32)
+        np.testing.assert_array_equal(
+            build_video_tokens(states, "state_only"), [[0, 0, 0, 0], [1, 2, 0, 0], [4, 4, 0, 0]]
+        )
+        # Same width and encoder size as the main model's [z, dz] tokens.
+        sizes = [
+            sum(p.numel() for p in TransitionRetrievalModel(2, 4, model_dim=8, num_heads=2,
+                                                            video_input=v).parameters())
+            for v in ("state_only", "state_transition")
+        ]
+        self.assertEqual(sizes[0], sizes[1])
+
+    def test_two_stage_token_matcher_for_both_encoders(self):
+        from unittest.mock import patch
+
+        from src.models.transition_model.pipelines import train_token_reranker as tr
+
+        rng = np.random.default_rng(0)
+        texts = ["pushing left", "pushing right", "opening box", "closing box"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            features = root / "features"
+            video_ids = [f"v{i}" for i in range(16)]
+            for vid in video_ids:
+                save_video_feature_cache(vid, np.arange(8), rng.normal(size=(8, 16)), features, "mock")
+            train = write_split(root, "train", video_ids[:8], texts * 2)
+            val = write_split(root, "val", video_ids[8:12], texts)
+            write_split(root, "test", video_ids[12:], texts)
+            (root / "action_contrast.jsonl").write_text(
+                json.dumps({"query_id": "test_q0", "target_video_id": "v12",
+                            "candidate_video_ids": ["v13", "v12"], "negative_types": ["opposite_action"]}),
+                encoding="utf-8",
+            )
+            checkpoints = root / "checkpoints"
+            with patch.object(tr, "ANNOTATION_ROOT", root):
+                for encoder, (run_name, stage1_run, video_input) in tr.ENCODERS.items():
+                    train_transition_model(
+                        train, val, features, checkpoints, log_dir=root / "logs", run_name=stage1_run,
+                        query_conditioned=False, video_input=video_input,
+                        epochs=1, batch_size=4, text_encoder="mock", device="cpu",
+                    )
+                    model, reranker, checkpoint = tr.train_token_reranker(
+                        42, encoder=encoder, feature_dir=features, checkpoint_dir=checkpoints,
+                        log_dir=root / "logs", epochs=1, batch_size=4, device="cpu",
+                    )
+                    output = root / f"{run_name}.json"
+                    result = tr.evaluate_token_reranker(
+                        model, reranker, checkpoint, output, features, "cpu",
+                        encoder=encoder, checkpoint_dir=checkpoints,
+                        per_query_path=root / f"per_query_{run_name}.jsonl",
+                        rankings_path=root / f"rankings_{run_name}.jsonl",
+                    )
+                    self.assertEqual(result["model_name"], run_name)
+                    self.assertEqual(result["video_input"], video_input)
+                    self.assertEqual(result["full"]["num_candidates"], 4)
+                    self.assertEqual(result["action_contrast"]["num_queries"], 1)
+                    per_query = [json.loads(line) for line in
+                                 (root / f"per_query_{run_name}.jsonl").read_text().splitlines()]
+                    self.assertEqual(len(per_query), 4)
+                    self.assertAlmostEqual(
+                        np.mean([r["full_rank"] == 1 for r in per_query]), result["full"]["recall@1"]
+                    )
+                    self.assertIsNone(per_query[1]["action_contrast_rank"])
+
+                    # Eval-only reload reproduces the scores; reverse-time uses the same checkpoint.
+                    model, reranker, checkpoint = tr.load_token_reranker(encoder, 42, checkpoints, "cpu")
+                    again = tr.evaluate_token_reranker(
+                        model, reranker, checkpoint, output, features, "cpu",
+                        encoder=encoder, checkpoint_dir=checkpoints, overwrite=False,
+                    )
+                    self.assertAlmostEqual(again["full"]["mrr"], result["full"]["mrr"], places=5)
+                    reverse = tr.evaluate_token_reranker(
+                        model, reranker, checkpoint, root / f"{run_name}_reversed.json", features,
+                        "cpu", encoder=encoder, checkpoint_dir=checkpoints, reverse_time=True,
+                    )
+                    self.assertTrue(reverse["reverse_time"])

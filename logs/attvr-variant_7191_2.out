@@ -1,0 +1,61 @@
+job=7194 task=2 host=farsight gpus=2
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-14T19:55:18-06:00
+variant=mean_transition
+[ablation_mean_transition] train rows: 168913 (skipped 0 without features)
+[ablation_mean_transition] val rows: 12388 (skipped 0 without features)
+[ablation_mean_transition] Epoch 1: loss=2.7523 val R@1=0.0271 MRR=0.0679
+[ablation_mean_transition] Epoch 2: loss=1.8671 val R@1=0.0387 MRR=0.0870
+[ablation_mean_transition] Epoch 3: loss=1.5820 val R@1=0.0417 MRR=0.0939
+[ablation_mean_transition] Epoch 4: loss=1.4043 val R@1=0.0473 MRR=0.1024
+[ablation_mean_transition] Epoch 5: loss=1.2729 val R@1=0.0522 MRR=0.1086
+[ablation_mean_transition] Epoch 6: loss=1.1704 val R@1=0.0497 MRR=0.1106
+[ablation_mean_transition] Epoch 7: loss=1.0826 val R@1=0.0516 MRR=0.1122
+[ablation_mean_transition] Epoch 8: loss=1.0114 val R@1=0.0554 MRR=0.1179
+[ablation_mean_transition] Epoch 9: loss=0.9438 val R@1=0.0559 MRR=0.1188
+[ablation_mean_transition] Epoch 10: loss=0.8865 val R@1=0.0574 MRR=0.1205
+[ablation_mean_transition] Epoch 11: loss=0.8320 val R@1=0.0574 MRR=0.1207
+[ablation_mean_transition] Epoch 12: loss=0.7859 val R@1=0.0591 MRR=0.1228
+[ablation_mean_transition] Epoch 13: loss=0.7397 val R@1=0.0601 MRR=0.1246
+[ablation_mean_transition] Epoch 14: loss=0.7004 val R@1=0.0596 MRR=0.1246
+[ablation_mean_transition] Epoch 15: loss=0.6639 val R@1=0.0597 MRR=0.1229
+[ablation_mean_transition] Epoch 16: loss=0.6291 val R@1=0.0597 MRR=0.1251
+[ablation_mean_transition] Epoch 17: loss=0.5990 val R@1=0.0637 MRR=0.1272
+[ablation_mean_transition] Epoch 18: loss=0.5698 val R@1=0.0622 MRR=0.1258
+[ablation_mean_transition] Epoch 19: loss=0.5433 val R@1=0.0606 MRR=0.1238
+[ablation_mean_transition] Epoch 20: loss=0.5197 val R@1=0.0625 MRR=0.1265
+[ablation_mean_transition] Epoch 21: loss=0.4970 val R@1=0.0605 MRR=0.1259
+[ablation_mean_transition] Epoch 22: loss=0.4736 val R@1=0.0594 MRR=0.1233
+[ablation_mean_transition] Early stop at epoch 22: no gain for 5 epochs
+[ablation_mean_transition] Best epoch 17 of 22
+{
+  "ablation_mean_transition_seed42": {
+    "full": {
+      "recall@1": 0.06005327306481556,
+      "recall@5": 0.17555896359673903,
+      "recall@10": 0.25232060699007186,
+      "mrr": 0.12497690320014954,
+      "map": 0.12497690320014954,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.6695455646137702,
+      "recall@5": 0.9546371781419001,
+      "recall@10": 1.0,
+      "mrr": 0.7891309857368469,
+      "map": 0.7891309857368469,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6828368046401265,
+      "recall@5": 0.933298180859478,
+      "recall@10": 1.0,
+      "mrr": 0.7875514626502991,
+      "map": 0.7875514626502991,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_mean_transition_seed42.json

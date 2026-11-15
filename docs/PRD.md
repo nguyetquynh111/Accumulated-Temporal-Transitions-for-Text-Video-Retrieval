@@ -9,7 +9,9 @@
 
 ### Research Question
 
-Can modeling temporal changes accumulated across a video improve text-to-video retrieval, especially for visually similar videos with different actions or outcomes?
+Can accumulated latent transitions between consecutive video states improve text-video retrieval compared with static video representations?
+
+The effect is expected mainly for visually similar videos with different actions or outcomes (action-sensitive retrieval), so it is measured both on full retrieval and on the hard-negative / action-contrast sets.
 
 ### Motivation
 
@@ -88,6 +90,43 @@ The output should summarize how the video evolves over time.
 Encode the text query and combine it with the accumulated temporal representation.
 
 Use a trained reranker to score candidate videos for each query.
+
+**Final method (amendment).** The reranker is a query-conditioned token-level
+cross-attention matcher (`src/models/transition_model/pipelines/train_token_reranker.py`):
+
+- The temporal encoder keeps its per-token outputs `ĥ_t` (one per `[z_t, Δz_t]`
+  token) and their pooled vector `v̄`.
+- The projected query `t` attends over `ĥ_1..ĥ_{T-1}` (multi-head
+  cross-attention), giving a query-specific video vector `a_q`.
+- Score: `s(q, v) = τ · cos(t, v̄) + g([t, a_q, t⊙a_q, |t − a_q|])`, where `τ`
+  is the learned, clamped inverse temperature and `g` is an MLP.
+
+**Two-stage training.** Stage 1 trains the temporal encoder, text projection,
+and `τ` with the cosine term only (the existing contrastive loss; checkpoint
+selected by development-validation MRR). Stage 2 freezes all stage-1 weights
+and trains only the matcher (attention projections and `g`) with the same loss,
+data, budget, and early stopping. The loss is unchanged from Milestone 2.
+
+The single-stage model of Milestone 2 (pooled vector `v̄` scored by
+`τ · cos(t, v̄) + g([t, v̄, t⊙v̄, |t − v̄|])`, trained end to end) is not the
+final method.
+
+### 3.6 Main Experiment — Matched Δz Control (E1 vs E2)
+
+This comparison answers the research question. Both models use the final
+method (Section 3.5), the same two-stage training, protocol, data, candidate
+sets, evaluator, and seeds 42, 43, 44. They differ only in the `Δz` channel:
+
+- **E2 — states + Δz (proposed):** tokens `[z_t, Δz_t]`, `t = 1..T-1`.
+- **E1 — states only:** tokens `[z_t, 0]`, `t = 1..T`. The zero channel keeps
+  the token width, the encoder, and the parameter count identical to E2, and
+  E1 sees every state that E2 can recover (E2 recovers `z_T` as
+  `z_{T-1} + Δz_{T-1}`), so only explicit `Δz` differs. E1's encoder and
+  matcher are trained independently; zeroing `Δz` at inference time on an E2
+  checkpoint is not a valid control.
+
+E1 is the matched no-transition control used for the main success criterion
+(Section 7).
 
 ---
 
@@ -345,6 +384,7 @@ Deliverables:
 - Hard-negative results
 - Baseline comparison
 - Ablations
+- Main matched comparison E1 vs E2 (three seeds) with per-query results
 
 ### Milestone 4 — Analysis and Final Report
 
@@ -356,6 +396,9 @@ Deliverables:
 - Discussion
 - Limitations
 - Presentation-ready results
+- Paper organized around the single research question: Introduction, Related
+  Work, Method, Experimental Setup, Results (E1 vs E2), Ablation Studies,
+  Discussion and Limitations, Conclusion
 
 ---
 

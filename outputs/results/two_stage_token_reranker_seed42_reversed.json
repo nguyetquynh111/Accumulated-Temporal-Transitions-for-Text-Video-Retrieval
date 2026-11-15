@@ -1,0 +1,123 @@
+{
+  "action_contrast": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.4378070831298828,
+        "num_negatives": 34137,
+        "num_queries": 3793,
+        "pairwise_accuracy": 0.6566189178896799,
+        "recall@1": 0.23807012918534143
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 1.0
+      },
+      "negatives_by_type": {
+        "opposite_action": 34137
+      },
+      "num_negatives": 34137,
+      "num_queries": 3793,
+      "queries_with_opposite_action": 3793,
+      "queries_with_opposite_action_share": 1.0,
+      "queries_with_type": {
+        "opposite_action": 3793
+      }
+    },
+    "map": 0.4378070831298828,
+    "mrr": 0.4378070831298828,
+    "num_candidates": 10,
+    "num_queries": 3793,
+    "recall@1": 0.23807012918534143,
+    "recall@10": 1.0,
+    "recall@5": 0.6986554178750329
+  },
+  "action_contrast_skipped": 0,
+  "best_epoch": 16,
+  "checkpoint_path": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/two_stage_token_reranker_seed42_best.pt",
+  "command": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/src/models/transition_model/pipelines/train_token_reranker.py --encoder full_transition --reverse-time --seeds 42 43 44",
+  "encoder_checkpoint": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_full_transition_without_query_conditioning_seed42_best.pt",
+  "epochs_run": 21,
+  "full": {
+    "map": 0.06770750880241394,
+    "mrr": 0.06770750880241394,
+    "num_candidates": 12389,
+    "num_queries": 12389,
+    "recall@1": 0.030268786827023973,
+    "recall@10": 0.13641133263378805,
+    "recall@5": 0.09088707724594398
+  },
+  "hard_negative": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.5400699377059937,
+        "num_negatives": 5390,
+        "num_queries": 1688,
+        "pairwise_accuracy": 0.4410018552875696,
+        "recall@1": 0.26954976303317535
+      },
+      "other_action": {
+        "mrr": 0.8426632285118103,
+        "num_negatives": 27652,
+        "num_queries": 4085,
+        "pairwise_accuracy": 0.9196803124547953,
+        "recall@1": 0.7463892288861689
+      },
+      "same_objects": {
+        "mrr": 0.6445191502571106,
+        "num_negatives": 78459,
+        "num_queries": 10511,
+        "pairwise_accuracy": 0.7966836181954906,
+        "recall@1": 0.4697935496146894
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "num_negatives": 111501,
+      "num_queries": 12389,
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392,
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      }
+    },
+    "map": 0.6233673095703125,
+    "mrr": 0.6233673095703125,
+    "num_candidates": 10,
+    "num_queries": 12389,
+    "recall@1": 0.4502381144563726,
+    "recall@10": 1.0,
+    "recall@5": 0.8643151182500606
+  },
+  "hard_negative_skipped": 0,
+  "model_name": "two_stage_token_reranker",
+  "query_conditioned": true,
+  "reranker": "token_cross_attention",
+  "reverse_time": true,
+  "seed": 42,
+  "skipped_missing_features": 0,
+  "split": "test",
+  "timestamp": "2026-11-15T16:59:14.527175+00:00",
+  "training_summary": {
+    "best_epoch": 16,
+    "best_score": 0.20343168079853058,
+    "epochs_run": 21,
+    "max_epochs": 50,
+    "patience": 5,
+    "reached_epoch_limit_while_improving": false,
+    "stopped_early": true
+  },
+  "variant": "two_stage_token_reranker",
+  "video_input": "state_transition"
+}

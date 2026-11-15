@@ -320,12 +320,7 @@ def _decode_video_frames(
     video_path: Path,
     stop_after: int | None = None,
 ) -> list[np.ndarray]:
-    """Decode RGB frames in order, stopping after index stop_after if given.
-
-    Frames are read sequentially instead of seeking. Seeking is slow for VP9
-    WebM, and the frame count stored in SSv2 files is sometimes larger than
-    the number of frames that can actually be decoded.
-    """
+    """Decode RGB frames in order, stopping after index stop_after if given."""
 
     import cv2
 
@@ -405,8 +400,6 @@ def get_dataset_sample(
 
     _validate_annotation_row(row)
 
-    # Decode once and sample from the frames that actually decode, since the
-    # frame count in the file header can overstate the real length.
     decoded = _decode_video_frames(Path(row["video_path"]))
 
     frame_indices = sample_ordered_frame_indices(

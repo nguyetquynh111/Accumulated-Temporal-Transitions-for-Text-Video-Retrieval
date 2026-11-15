@@ -1,0 +1,14 @@
+job=7261 task=none host=farsight gpus=0
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T13:05:19-06:00
+{
+  "two_stage_token_reranker_state_only_seed42_reversed": {
+    "recall@1": 0.05819678747275809,
+    "recall@5": 0.16926305593671806,
+    "recall@10": 0.24279602873516828,
+    "mrr": 0.12027894705533981,
+    "map": 0.12027894705533981,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_state_only_seed42_reversed.json

@@ -1,0 +1,89 @@
+job=7269 task=1 host=farsight gpus=1
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T12:28:35-06:00
+run=ablation_state_only_without_query_conditioning seed=43
+Train rows: 168913 (skipped 0 without features)
+Val rows: 12388 (skipped 0 without features)
+Epoch 1: loss=2.1180 val R@1=0.0526 MRR=0.1084
+Epoch 2: loss=1.3054 val R@1=0.0679 MRR=0.1352
+Epoch 3: loss=1.0221 val R@1=0.0782 MRR=0.1521
+Epoch 4: loss=0.8514 val R@1=0.0814 MRR=0.1595
+Epoch 5: loss=0.7352 val R@1=0.0899 MRR=0.1706
+Epoch 6: loss=0.6466 val R@1=0.0915 MRR=0.1738
+Epoch 7: loss=0.5740 val R@1=0.0963 MRR=0.1817
+Epoch 8: loss=0.5151 val R@1=0.0980 MRR=0.1846
+Epoch 9: loss=0.4675 val R@1=0.1033 MRR=0.1893
+Epoch 10: loss=0.4240 val R@1=0.1011 MRR=0.1893
+Epoch 11: loss=0.3894 val R@1=0.1003 MRR=0.1884
+Epoch 12: loss=0.3563 val R@1=0.0992 MRR=0.1867
+Epoch 13: loss=0.3297 val R@1=0.0987 MRR=0.1860
+Epoch 14: loss=0.3055 val R@1=0.1011 MRR=0.1893
+Early stop at epoch 14: no gain for 5 epochs
+Best epoch 9 of 14
+Best checkpoint: /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_state_only_without_query_conditioning_seed43_best.pt
+{
+  "checkpoint": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_state_only_without_query_conditioning_seed43_best.pt",
+  "full": {
+    "recall@1": 0.09653725078698845,
+    "recall@5": 0.25861651465009283,
+    "recall@10": 0.3574138348534991,
+    "mrr": 0.18242982029914856,
+    "map": 0.18242982029914856,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  },
+  "hard_negative": {
+    "recall@1": 0.7518766647832755,
+    "recall@5": 0.9761078375978691,
+    "recall@10": 1.0,
+    "mrr": 0.8479437828063965,
+    "map": 0.8479437828063965,
+    "num_queries": 12389,
+    "num_candidates": 10,
+    "coverage": {
+      "num_queries": 12389,
+      "num_negatives": 111501,
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      },
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392
+    }
+  },
+  "action_contrast": {
+    "recall@1": 0.6875823886105985,
+    "recall@5": 0.9496440812022146,
+    "recall@10": 1.0,
+    "mrr": 0.7973750829696655,
+    "map": 0.7973750829696655,
+    "num_queries": 3793,
+    "num_candidates": 10,
+    "coverage": {
+      "num_queries": 3793,
+      "num_negatives": 34137,
+      "negatives_by_type": {
+        "opposite_action": 34137
+      },
+      "negative_share_by_type": {
+        "opposite_action": 1.0
+      },
+      "queries_with_type": {
+        "opposite_action": 3793
+      },
+      "queries_with_opposite_action": 3793,
+      "queries_with_opposite_action_share": 1.0
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_state_only_without_query_conditioning_seed43.json

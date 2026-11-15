@@ -1,0 +1,34 @@
+job=7218 task=none host=farsight gpus=2
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T09:19:06-06:00
+[two_stage_token_reranker] encoding 168913 train rows with the frozen encoder
+[two_stage_token_reranker] Epoch 1: loss=0.1339 val R@1=0.1071 MRR=0.1965
+[two_stage_token_reranker] Epoch 2: loss=0.1260 val R@1=0.1072 MRR=0.1977
+[two_stage_token_reranker] Epoch 3: loss=0.1212 val R@1=0.1071 MRR=0.1984
+[two_stage_token_reranker] Epoch 4: loss=0.1190 val R@1=0.1083 MRR=0.1991
+[two_stage_token_reranker] Epoch 5: loss=0.1157 val R@1=0.1076 MRR=0.1992
+[two_stage_token_reranker] Epoch 6: loss=0.1136 val R@1=0.1090 MRR=0.1997
+[two_stage_token_reranker] Epoch 7: loss=0.1133 val R@1=0.1087 MRR=0.1998
+[two_stage_token_reranker] Epoch 8: loss=0.1105 val R@1=0.1087 MRR=0.2000
+[two_stage_token_reranker] Epoch 9: loss=0.1098 val R@1=0.1074 MRR=0.1996
+[two_stage_token_reranker] Epoch 10: loss=0.1086 val R@1=0.1074 MRR=0.1996
+[two_stage_token_reranker] Epoch 11: loss=0.1072 val R@1=0.1091 MRR=0.2001
+[two_stage_token_reranker] Epoch 12: loss=0.1063 val R@1=0.1095 MRR=0.2008
+[two_stage_token_reranker] Epoch 13: loss=0.1051 val R@1=0.1103 MRR=0.2011
+[two_stage_token_reranker] Epoch 14: loss=0.1045 val R@1=0.1091 MRR=0.2007
+[two_stage_token_reranker] Epoch 15: loss=0.1045 val R@1=0.1100 MRR=0.2005
+[two_stage_token_reranker] Epoch 16: loss=0.1047 val R@1=0.1083 MRR=0.1996
+[two_stage_token_reranker] Epoch 17: loss=0.1015 val R@1=0.1095 MRR=0.2004
+[two_stage_token_reranker] Epoch 18: loss=0.1019 val R@1=0.1097 MRR=0.2008
+[two_stage_token_reranker] best epoch 13 of 18
+{
+  "two_stage_token_reranker_seed44": {
+    "recall@1": 0.10727258051497296,
+    "recall@5": 0.27758495439502784,
+    "recall@10": 0.38251674872871094,
+    "mrr": 0.19722628593444824,
+    "map": 0.19722628593444824,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed44.json

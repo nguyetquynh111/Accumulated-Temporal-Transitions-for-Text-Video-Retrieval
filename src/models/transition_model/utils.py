@@ -126,20 +126,25 @@ class TransitionDataset(Dataset):
         labels: list[int],
         feature_dir: Path,
         video_input: str = DEFAULT_VIDEO_INPUT,
+        reverse_time: bool = False,
     ):
+        """With reverse_time, states are reversed before tokens are built (evaluation only)."""
         if len(video_ids) != len(labels):
             raise ValueError("video_ids and labels must have the same length")
         self.video_ids = video_ids
         self.labels = labels
         self.feature_dir = Path(feature_dir)
         self.video_input = video_input
+        self.reverse_time = reverse_time
 
     def __len__(self) -> int:
         return len(self.video_ids)
 
     def __getitem__(self, index: int) -> tuple[np.ndarray, int]:
-        tokens = load_video_tokens(self.feature_dir, self.video_ids[index], self.video_input)
-        return tokens, self.labels[index]
+        states = load_states(self.feature_dir, self.video_ids[index])
+        if self.reverse_time:
+            states = np.ascontiguousarray(states[::-1])
+        return build_video_tokens(states, self.video_input), self.labels[index]
 
 
 def collate_transitions(

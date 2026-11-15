@@ -1,0 +1,95 @@
+job=7268 task=0 host=farsight gpus=0
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T12:28:35-06:00
+run=ablation_state_only_without_query_conditioning seed=42
+Train rows: 168913 (skipped 0 without features)
+Val rows: 12388 (skipped 0 without features)
+Epoch 1: loss=2.1139 val R@1=0.0540 MRR=0.1105
+Epoch 2: loss=1.3059 val R@1=0.0660 MRR=0.1332
+Epoch 3: loss=1.0244 val R@1=0.0735 MRR=0.1465
+Epoch 4: loss=0.8542 val R@1=0.0824 MRR=0.1597
+Epoch 5: loss=0.7383 val R@1=0.0892 MRR=0.1698
+Epoch 6: loss=0.6474 val R@1=0.0901 MRR=0.1737
+Epoch 7: loss=0.5749 val R@1=0.0940 MRR=0.1788
+Epoch 8: loss=0.5187 val R@1=0.0953 MRR=0.1824
+Epoch 9: loss=0.4698 val R@1=0.0957 MRR=0.1808
+Epoch 10: loss=0.4283 val R@1=0.0985 MRR=0.1855
+Epoch 11: loss=0.3925 val R@1=0.0958 MRR=0.1842
+Epoch 12: loss=0.3604 val R@1=0.1034 MRR=0.1902
+Epoch 13: loss=0.3319 val R@1=0.1003 MRR=0.1879
+Epoch 14: loss=0.3097 val R@1=0.0963 MRR=0.1849
+Epoch 15: loss=0.2870 val R@1=0.1050 MRR=0.1912
+Epoch 16: loss=0.2690 val R@1=0.0995 MRR=0.1889
+Epoch 17: loss=0.2501 val R@1=0.0983 MRR=0.1864
+Epoch 18: loss=0.2337 val R@1=0.1008 MRR=0.1887
+Epoch 19: loss=0.2228 val R@1=0.1022 MRR=0.1910
+Epoch 20: loss=0.2084 val R@1=0.1021 MRR=0.1900
+Early stop at epoch 20: no gain for 5 epochs
+Best epoch 15 of 20
+Best checkpoint: /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_state_only_without_query_conditioning_seed42_best.pt
+{
+  "checkpoint": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_state_only_without_query_conditioning_seed42_best.pt",
+  "full": {
+    "recall@1": 0.1054160949229155,
+    "recall@5": 0.2745984340947615,
+    "recall@10": 0.37016708370328516,
+    "mrr": 0.1933775246143341,
+    "map": 0.1933775246143341,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  },
+  "hard_negative": {
+    "recall@1": 0.762531277746388,
+    "recall@5": 0.9787714908386472,
+    "recall@10": 1.0,
+    "mrr": 0.8556129336357117,
+    "map": 0.8556129336357117,
+    "num_queries": 12389,
+    "num_candidates": 10,
+    "coverage": {
+      "num_queries": 12389,
+      "num_negatives": 111501,
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      },
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392
+    }
+  },
+  "action_contrast": {
+    "recall@1": 0.7210651199578171,
+    "recall@5": 0.9551805958344318,
+    "recall@10": 1.0,
+    "mrr": 0.8206906914710999,
+    "map": 0.8206906914710999,
+    "num_queries": 3793,
+    "num_candidates": 10,
+    "coverage": {
+      "num_queries": 3793,
+      "num_negatives": 34137,
+      "negatives_by_type": {
+        "opposite_action": 34137
+      },
+      "negative_share_by_type": {
+        "opposite_action": 1.0
+      },
+      "queries_with_type": {
+        "opposite_action": 3793
+      },
+      "queries_with_opposite_action": 3793,
+      "queries_with_opposite_action_share": 1.0
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_state_only_without_query_conditioning_seed42.json

@@ -1,43 +1,25 @@
 """B2 baseline (pooled V-JEPA, no transitions) and the transition ablations (T2.7, T3.3).
 
 Every variant feeds a different view of the same cached V-JEPA states into the
-shared TransitionRetrievalModel, trains it with the main training protocol
-(fit_retrieval_model: same loss, epoch limit, early stopping, and selection
-metric), and is scored with the shared evaluator. Only the video input, and for
+shared TransitionRetrievalModel, trains it with the main training protocol, and
+is scored with the shared evaluator. Only the video input, and for
 two variants the query-conditioned reranker, changes between runs:
 
 - pooled: mean state as one token, no reranker (B2).
 - full_transition: [z[t], z[t + 1] - z[t]] tokens with the reranker. This is the
-  main model; it is trained by pipelines.train, and here only its checkpoint
-  is evaluated, to get rankings in the same format as the other variants. Its
-  metrics go to full_transition_seed<seed>.json; the main result file
-  transition_model_seed<seed>.json is written by pipelines.evaluate.
+  main model; evaluate its checkpoint with it to get comparable rankings.
 - no_transition: the raw state sequence z[1:T] instead of transitions.
 - mean_transition: the mean transition vector as one token.
 - final_minus_initial: z[T] - z[1] as one token.
-- full_transition_without_query_conditioning: the main model's [z, dz] tokens,
-  no reranker (B3).
-- shuffled_full_transition: the main model's [z, dz] tokens with the reranker,
-  but in a shuffled token order. Each dz is still computed from adjacent
-  frames, so only the order of the transitions is lost.
-- shuffled_no_transition: the state sequence z[1:T] in a shuffled frame
-  order, with the reranker. Order is lost, and dz cannot be recovered either,
-  since the model no longer knows which frames are adjacent.
-
-The shuffled variants use one fixed permutation per video, seeded from its id,
-so a video gets the same order in training and evaluation.
+- full_transition_without_query_conditioning: [z, dz] tokens, no reranker (B3).
 
 Note that the mean of z[t + 1] - z[t] telescopes to (z[T] - z[1]) / (T - 1), and
 the model's input LayerNorm removes that scale, so mean_transition and
 final_minus_initial see the same input up to a constant factor.
-
-Checkpoints, logs, results, and rankings are named <result_name>_seed<seed>,
-like the main model's.
 """
 
 import argparse
 import json
-import zlib
 from pathlib import Path
 
 import numpy as np
@@ -109,24 +91,13 @@ VARIANTS = {
     "mean_transition": True,
     "final_minus_initial": True,
     "full_transition_without_query_conditioning": False,
-    "shuffled_full_transition": True,
-    "shuffled_no_transition": True,
 }
-# Variants that read the main model's [z, dz] tokens; the others are single-stream.
-STATE_TRANSITION_VARIANTS = (
-    "full_transition",
-    "full_transition_without_query_conditioning",
-    "shuffled_full_transition",
-)
-# Variants whose tokens are put in a fixed per-video random order.
-SHUFFLED_VARIANTS = ("shuffled_full_transition", "shuffled_no_transition")
+STATE_TRANSITION_VARIANTS = ("full_transition", "full_transition_without_query_conditioning")
 ABLATION_VARIANTS = (
     "no_transition",
     "mean_transition",
     "final_minus_initial",
     "full_transition_without_query_conditioning",
-    "shuffled_full_transition",
-    "shuffled_no_transition",
 )
 ENCODE_BATCH_SIZE = 256
 NUM_WORKERS = 0
@@ -157,29 +128,12 @@ def main_checkpoint_path(checkpoint_dir: Path = CHECKPOINT_ROOT, seed: int = RAN
     return checkpoint_path(checkpoint_dir, MAIN_RUN_NAME, seed)
 
 
-def shuffle_tokens(tokens: np.ndarray, video_id: str) -> np.ndarray:
-    """Return tokens in a fixed random order that depends only on video_id."""
-    rng = np.random.default_rng(zlib.crc32(video_id.encode("utf-8")))
-    return tokens[rng.permutation(len(tokens))]
-
-
 def variant_sequence(
     variant: str,
     state_embeddings: np.ndarray,
     transition_embeddings: np.ndarray | None = None,
-    video_id: str | None = None,
 ) -> np.ndarray:
-    """Return the (L, D) or (L, 2D) video input one variant feeds to the retrieval model.
-
-    The shuffled variants need video_id, which seeds their token order.
-    """
-    if variant in SHUFFLED_VARIANTS:
-        if video_id is None:
-            raise ValueError(f"variant {variant} needs a video_id to seed its token order")
-        unshuffled = variant.removeprefix("shuffled_")
-        return shuffle_tokens(
-            variant_sequence(unshuffled, state_embeddings, transition_embeddings), video_id
-        )
+    """Return the (L, D) or (L, 2D) video input one variant feeds to the retrieval model."""
     states = np.asarray(state_embeddings, dtype=np.float32)
     if states.ndim != 2 or states.shape[0] < 2:
         raise ValueError("state_embeddings must have shape (T, D) with T >= 2")
@@ -218,9 +172,8 @@ class VariantDataset(Dataset):
         return len(self.video_ids)
 
     def __getitem__(self, index: int) -> tuple[np.ndarray, int]:
-        video_id = self.video_ids[index]
-        states = load_states(self.feature_dir, video_id)
-        return variant_sequence(self.variant, states, video_id=video_id), self.labels[index]
+        states = load_states(self.feature_dir, self.video_ids[index])
+        return variant_sequence(self.variant, states), self.labels[index]
 
 
 def encode_variant_bank(
@@ -338,11 +291,7 @@ def train_variant_model(
     limit: int | None = None,
     seed: int = RANDOM_SEED,
 ) -> Path:
-    """Train one baseline/ablation variant with the main training protocol.
-
-    Returns `<checkpoint_dir>/<result_name>_seed<seed>_best.pt`; the per-epoch log
-    goes to `<log_dir>/<result_name>_seed<seed>_train_log.jsonl`.
-    """
+    """Train one baseline/ablation variant and return its best checkpoint path."""
     if variant == "full_transition":
         raise ValueError(
             "train the main model with src.models.transition_model.pipelines.train"
@@ -472,7 +421,7 @@ def run_transition_ablation(
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
     sequences = [
-        variant_sequence(variant, states, transition_embeddings.get(video_id), video_id)
+        variant_sequence(variant, states, transition_embeddings.get(video_id))
         for video_id, states in state_embeddings.items()
     ]
     if model is None:
@@ -546,7 +495,7 @@ def main() -> None:
         nargs="+",
         choices=(*VARIANTS, "all_ablations"),
         default=["pooled"],
-        help="one or more variants; all_ablations runs every ablation in ABLATION_VARIANTS",
+        help="one or more variants; all_ablations runs the four T3.3 variants",
     )
     parser.add_argument("--train-annotations", type=Path, default=ANNOTATION_ROOT / "train.jsonl")
     parser.add_argument("--val-annotations", type=Path, default=ANNOTATION_ROOT / "val.jsonl")
@@ -626,8 +575,6 @@ def main() -> None:
                     seed=seed,
                 )
             stem = f"{result_name(variant)}_seed{seed}"
-            # pipelines.evaluate owns <main run>_seed<seed>.json, so the main model's
-            # result from this runner goes to its own file.
             output_stem = f"full_transition_seed{seed}" if variant == "full_transition" else stem
             output = args.result_dir / f"{output_stem}.json"
             result = evaluate_variant(

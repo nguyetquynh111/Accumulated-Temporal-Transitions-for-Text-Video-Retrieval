@@ -114,7 +114,6 @@ class VjepaBaselineTests(unittest.TestCase):
         states = np.array([[0, 0], [1, 2], [4, 4]], dtype=np.float32)
         self.assertEqual(variant_sequence("pooled", states).shape, (1, 2))
         np.testing.assert_array_equal(variant_sequence("no_transition", states), states)
-        # The main model's tokens [z[t], z[t + 1] - z[t]].
         np.testing.assert_array_equal(
             variant_sequence("full_transition", states), [[0, 0, 1, 2], [1, 2, 3, 2]]
         )
@@ -122,29 +121,6 @@ class VjepaBaselineTests(unittest.TestCase):
         np.testing.assert_array_equal(variant_sequence("mean_transition", states), [[2, 2]])
         with self.assertRaises(ValueError):
             variant_sequence("unknown", states)
-
-    def test_shuffled_variants_permute_tokens_per_video(self):
-        states = np.arange(16 * 3, dtype=np.float32).reshape(16, 3)
-        full = variant_sequence("full_transition", states)
-        shuffled = variant_sequence("shuffled_full_transition", states, video_id="v1")
-        # Same [z, dz] tokens, in another order: dz is still taken between adjacent frames.
-        self.assertFalse(np.array_equal(shuffled, full))
-        np.testing.assert_array_equal(
-            np.sort(shuffled.view([("", np.float32)] * 6), axis=0),
-            np.sort(full.view([("", np.float32)] * 6), axis=0),
-        )
-        frames = variant_sequence("shuffled_no_transition", states, video_id="v1")
-        self.assertFalse(np.array_equal(frames, states))
-        np.testing.assert_array_equal(frames[np.argsort(frames[:, 0])], states)
-        # The order is fixed per video, and differs between videos.
-        np.testing.assert_array_equal(
-            frames, variant_sequence("shuffled_no_transition", states, video_id="v1")
-        )
-        self.assertFalse(
-            np.array_equal(frames, variant_sequence("shuffled_no_transition", states, video_id="v2"))
-        )
-        with self.assertRaisesRegex(ValueError, "video_id"):
-            variant_sequence("shuffled_no_transition", states)
 
     def test_untrained_scoring_keeps_candidate_order(self):
         states = {"a": np.array([[0, 0], [1, 0]]), "b": np.array([[0, 0], [0, 1]])}
@@ -225,7 +201,6 @@ class VjepaBaselineTests(unittest.TestCase):
                 )
                 self.assertEqual(len(load_jsonl(root / f"rankings_{variant}.jsonl")), 4)
 
-            # The main model trained by pipelines.train is evaluated as full_transition.
             main = train_transition_model(
                 train, val, features, root / "checkpoints", log_dir=root / "logs",
                 epochs=1, batch_size=4, text_encoder="mock", device="cpu",

@@ -1,0 +1,46 @@
+job=7217 task=none host=farsight gpus=1
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T09:19:06-06:00
+[two_stage_token_reranker] encoding 168913 train rows with the frozen encoder
+[two_stage_token_reranker] Epoch 1: loss=0.1300 val R@1=0.1040 MRR=0.1946
+[two_stage_token_reranker] Epoch 2: loss=0.1204 val R@1=0.1047 MRR=0.1962
+[two_stage_token_reranker] Epoch 3: loss=0.1158 val R@1=0.1062 MRR=0.1972
+[two_stage_token_reranker] Epoch 4: loss=0.1113 val R@1=0.1053 MRR=0.1976
+[two_stage_token_reranker] Epoch 5: loss=0.1096 val R@1=0.1058 MRR=0.1981
+[two_stage_token_reranker] Epoch 6: loss=0.1086 val R@1=0.1077 MRR=0.1989
+[two_stage_token_reranker] Epoch 7: loss=0.1079 val R@1=0.1078 MRR=0.1998
+[two_stage_token_reranker] Epoch 8: loss=0.1044 val R@1=0.1077 MRR=0.1997
+[two_stage_token_reranker] Epoch 9: loss=0.1027 val R@1=0.1079 MRR=0.1999
+[two_stage_token_reranker] Epoch 10: loss=0.1035 val R@1=0.1093 MRR=0.2007
+[two_stage_token_reranker] Epoch 11: loss=0.1023 val R@1=0.1087 MRR=0.2007
+[two_stage_token_reranker] Epoch 12: loss=0.1008 val R@1=0.1067 MRR=0.1992
+[two_stage_token_reranker] Epoch 13: loss=0.1001 val R@1=0.1078 MRR=0.1996
+[two_stage_token_reranker] Epoch 14: loss=0.1006 val R@1=0.1082 MRR=0.2004
+[two_stage_token_reranker] Epoch 15: loss=0.0990 val R@1=0.1096 MRR=0.2011
+[two_stage_token_reranker] Epoch 16: loss=0.0982 val R@1=0.1075 MRR=0.2001
+[two_stage_token_reranker] Epoch 17: loss=0.0983 val R@1=0.1087 MRR=0.2010
+[two_stage_token_reranker] Epoch 18: loss=0.0964 val R@1=0.1083 MRR=0.2011
+[two_stage_token_reranker] Epoch 19: loss=0.0969 val R@1=0.1079 MRR=0.2010
+[two_stage_token_reranker] Epoch 20: loss=0.0974 val R@1=0.1089 MRR=0.2016
+[two_stage_token_reranker] Epoch 21: loss=0.0954 val R@1=0.1081 MRR=0.2011
+[two_stage_token_reranker] Epoch 22: loss=0.0964 val R@1=0.1084 MRR=0.2016
+[two_stage_token_reranker] Epoch 23: loss=0.0956 val R@1=0.1095 MRR=0.2013
+[two_stage_token_reranker] Epoch 24: loss=0.0954 val R@1=0.1086 MRR=0.2007
+[two_stage_token_reranker] Epoch 25: loss=0.0952 val R@1=0.1101 MRR=0.2021
+[two_stage_token_reranker] Epoch 26: loss=0.0953 val R@1=0.1090 MRR=0.2017
+[two_stage_token_reranker] Epoch 27: loss=0.0934 val R@1=0.1073 MRR=0.2003
+[two_stage_token_reranker] Epoch 28: loss=0.0937 val R@1=0.1078 MRR=0.2006
+[two_stage_token_reranker] Epoch 29: loss=0.0952 val R@1=0.1083 MRR=0.2008
+[two_stage_token_reranker] Epoch 30: loss=0.0921 val R@1=0.1089 MRR=0.2012
+[two_stage_token_reranker] best epoch 25 of 30
+{
+  "two_stage_token_reranker_seed43": {
+    "recall@1": 0.10880619904754217,
+    "recall@5": 0.279037856162725,
+    "recall@10": 0.38655258697231415,
+    "mrr": 0.19984324276447296,
+    "map": 0.19984324276447296,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed43.json

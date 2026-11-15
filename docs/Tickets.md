@@ -468,6 +468,10 @@ Acceptance criteria:
   Their norms differ by about a factor of 6.5, so one LayerNorm over the
   concatenation would let the states dominate.
 
+Implementation note (final method): besides the pooled representation, the
+encoder's per-token outputs (one per `[z[t], Δz[t]]` token) are used by the
+token-level matcher of T2.3. The pooled-vector interface above is unchanged.
+
 ### T2.3 - Implement Query-Conditioned Reranker
 
 Owner: Quynh
@@ -508,6 +512,20 @@ Acceptance criteria:
 - Higher scores always mean better query-video matches.
 - Query order and candidate order are preserved in all outputs.
 - The reranker can run with cached features without re-encoding videos.
+
+Implementation note (final method, added after Milestone 2): the single-stage
+reranker in `retrieval.py` scores pooled vectors,
+`τ·cos(t, v) + g([t, v, t*v, |t-v|])`. The final method's reranker scores
+temporal tokens instead:
+
+- File: `src/models/transition_model/pipelines/train_token_reranker.py`
+  (`TokenCrossAttentionReranker`).
+- The projected text `t` attends (multi-head cross-attention) over the frozen
+  encoder's per-token outputs, giving `a_q`; score =
+  `τ·cos(t, v_pooled) + g([t, a_q, t*a_q, |t-a_q|])`, with `τ` frozen from
+  stage 1.
+- Output still follows the shared retrieval score format (higher is better,
+  `(N_queries, N_candidates)`).
 
 ### T2.4 - Build Main Training Pipeline
 
@@ -553,6 +571,12 @@ Acceptance criteria:
 - The seed is a parameter and is recorded in the checkpoint and log names.
 - The epoch limit, patience, learning rate, batch size, and selection metric
   are defined once and shared with the ablation runners (T3.3).
+
+Implementation note (final method): training is two-stage. Stage 1 trains the
+encoder with the cosine term only (`vjepa_baseline --variant
+full_transition_without_query_conditioning`); stage 2 freezes it and trains the
+token-level matcher (`train_token_reranker`). Both stages use the loss and the
+protocol above.
 
 ### T2.5 - Implement Shared Retrieval Evaluator
 
@@ -604,7 +628,12 @@ Owner: Priyanka
 Files:
 
 - `src/eval/evaluate.py`
+- `src/eval/candidate_metrics.py`
+- `src/data/candidate_sets.py`
+- `src/data/build_candidate_sets.py`
 - `data/annotations/hard_negatives.jsonl` generated locally only
+- `data/annotations/action_contrast.jsonl` generated locally only
+- `data/annotations/opposite_label_pairs.tsv` generated locally only
 
 Inputs:
 
@@ -624,6 +653,7 @@ def build_hard_negative_set(
 Required evaluator helpers:
 
 ```python
+# src/eval/evaluate.py
 def compute_hard_negative_metrics(
     hard_negative_rows: list[dict],
     score_lookup: dict[tuple[str, str], float],
@@ -631,12 +661,14 @@ def compute_hard_negative_metrics(
 ) -> dict:
     """Evaluate per-query hard-negative candidate sets."""
 
+# src/eval/candidate_metrics.py
 def compute_hard_negative_metrics_by_type(
     hard_negative_rows: list[dict],
     score_lookup: dict[tuple[str, str], float],
 ) -> dict[str, dict]:
     """Return pairwise accuracy and restricted Recall@1 for each negative type."""
 
+# src/data/candidate_sets.py
 def build_action_contrast_set(
     annotations: list[dict],
     output_path: Path,
@@ -715,35 +747,53 @@ Acceptance criteria:
 
 ## Milestone 3 - Experiments and Ablations
 
-### T3.1 - Run Full Transition Model Experiments
+### T3.1 - Run the Main Matched Experiment (E1 vs E2)
 
 Owner: Quynh
 
 Files:
 
-- `src/models/transition_model/pipelines/evaluate.py`
-- `outputs/results/transition_model_full.json` generated locally only
+- `src/models/transition_model/pipelines/train.py` (stage 1 of E1)
+- `src/models/transition_model/pipelines/train_token_reranker.py` (stage 2)
+- `scripts/submit_main_experiment.sh`
+- `outputs/results/two_stage_token_reranker[_state_only]_seed<seed>.json`,
+  `per_query_*.jsonl`, `rankings_*.jsonl` generated locally only
 
 Inputs:
 
-- Best transition model checkpoint.
-- Test split annotations.
-- Cached V-JEPA and transition features.
+- Cached V-JEPA states, train/val/test annotations, hard-negative and
+  action-contrast sets.
 
-Outputs:
+Design:
 
-- Full retrieval metrics on the held-out test split.
-- Hard-negative retrieval metrics when hard-negative metadata is available.
+- E2: tokens `[z[t], Δz[t]]`, `t = 1..T-1` (`video_input` `state_transition`);
+  stage 1 `ablation_full_transition_without_query_conditioning` (trained),
+  stage 2 `--encoder full_transition`.
+- E1: tokens `[z[t], 0]`, `t = 1..T` (`video_input` `state_only`); stage 1
+  `pipelines.train --run-name ablation_state_only_without_query_conditioning
+  --video-input state_only --no-query-conditioning`, stage 2
+  `--encoder state_only`. Same token width, encoder, matcher, and parameter
+  count as E2; E1 sees all `T` states (E2 recovers `z[T]` from
+  `z[T-1] + Δz[T-1]`), so only explicit `Δz` differs.
 
 Acceptance criteria:
 
-- Results include Recall@1, Recall@5, Recall@10, MRR, and mAP.
-- The command/config used to generate the result is documented.
-- Result files include model name, checkpoint path, split name, and timestamp.
-- Results are produced for seeds 42, 43, and 44. Each result file records its
-  seed and best epoch.
-- Hard-negative results include the per-type metrics and the action-contrast
-  set (T2.6).
+- E1 and E2 use the same loss, data, candidate sets, epoch limit, early
+  stopping on validation MRR (`fit_retrieval_model`, T2.4), and seeds 42, 43,
+  44. Each stage of E1 is trained independently; no inference-time zeroing of
+  an E2 checkpoint.
+- Each result file records seed, best epoch, stage-1 checkpoint path, and
+  `video_input`.
+- Results include Recall@1/5/10, MRR, and mAP on the full split, the
+  hard-negative set (per type), and the action-contrast set, computed with the
+  shared evaluator (T2.5, T2.6).
+- Every evaluation exports per-query ranks for the paired bootstrap of T3.2,
+  one JSON line per test query in `per_query_<run>_seed<seed>.jsonl`:
+  `{"query_id": ..., "full_rank": ..., "hard_negative_rank": ...,
+  "action_contrast_rank": ...}` (1-based, same tie rule as the metrics, `null`
+  if the query is not in that set). `--eval-only` re-evaluates trained
+  checkpoints without retraining; `--reverse-time` evaluates them with states
+  reversed in time.
 
 ### T3.2 - Run Shared Evaluation and Comparison Tables
 
@@ -955,12 +1005,24 @@ Acceptance criteria:
 - The report separates full retrieval and hard-negative retrieval results.
 - Limitations include dataset scope, compute constraints, and simple transition
   operation assumptions.
-- Claims about transitions rest on the comparison with `no_transition`, not on
-  comparisons with B1 or B2 alone.
+- The paper is organized around the single research question: Introduction,
+  Related Work, Method (explicit transitions, temporal encoder,
+  query-conditioned token-level matching, two-stage training), Experimental
+  Setup, Results (E1 vs E2), Ablation Studies, Discussion and Limitations,
+  Conclusion. Token-level matching is described as part of the method, not as
+  a separate contribution.
+- Claims about transitions rest on E1 vs E2, not on comparisons with B1 or B2
+  alone.
+- A gain on general retrieval (full-split MRR) is claimed only if it meets the
+  PRD criterion; current evidence supports only the action-sensitive settings.
 - The conclusion follows the main success criterion in PRD Section 7, and a
   null result is reported as one.
 - Limitations also note that V-JEPA 2 states are already temporally
-  contextualized, and that the 16 states are interpolated from 8 tubelets.
+  contextualized, and that the 16 states are interpolated from 8 tubelets;
+  that SSv2 captions are templated (26% of test queries share their exact
+  caption) and only the source video counts as correct among 12,389
+  candidates; and that the final configuration (two-stage, token-level matching) was chosen
+  during development, so claims rest on the matched E1/E2 comparison.
 
 ## Final Deliverables
 

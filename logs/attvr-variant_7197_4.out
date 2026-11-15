@@ -1,0 +1,64 @@
+job=7197 task=4 host=farsight gpus=2
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T05:19:03-06:00
+variant=full_transition_without_query_conditioning
+[ablation_full_transition_without_query_conditioning] train rows: 168913 (skipped 0 without features)
+[ablation_full_transition_without_query_conditioning] val rows: 12388 (skipped 0 without features)
+[ablation_full_transition_without_query_conditioning] Epoch 1: loss=1.9568 val R@1=0.0585 MRR=0.1207
+[ablation_full_transition_without_query_conditioning] Epoch 2: loss=1.1519 val R@1=0.0692 MRR=0.1423
+[ablation_full_transition_without_query_conditioning] Epoch 3: loss=0.8977 val R@1=0.0813 MRR=0.1607
+[ablation_full_transition_without_query_conditioning] Epoch 4: loss=0.7422 val R@1=0.0862 MRR=0.1685
+[ablation_full_transition_without_query_conditioning] Epoch 5: loss=0.6352 val R@1=0.0900 MRR=0.1736
+[ablation_full_transition_without_query_conditioning] Epoch 6: loss=0.5515 val R@1=0.0918 MRR=0.1756
+[ablation_full_transition_without_query_conditioning] Epoch 7: loss=0.4842 val R@1=0.0994 MRR=0.1845
+[ablation_full_transition_without_query_conditioning] Epoch 8: loss=0.4282 val R@1=0.0957 MRR=0.1842
+[ablation_full_transition_without_query_conditioning] Epoch 9: loss=0.3823 val R@1=0.1021 MRR=0.1882
+[ablation_full_transition_without_query_conditioning] Epoch 10: loss=0.3421 val R@1=0.1007 MRR=0.1890
+[ablation_full_transition_without_query_conditioning] Epoch 11: loss=0.3122 val R@1=0.0987 MRR=0.1877
+[ablation_full_transition_without_query_conditioning] Epoch 12: loss=0.2817 val R@1=0.1012 MRR=0.1890
+[ablation_full_transition_without_query_conditioning] Epoch 13: loss=0.2606 val R@1=0.0981 MRR=0.1850
+[ablation_full_transition_without_query_conditioning] Epoch 14: loss=0.2405 val R@1=0.0978 MRR=0.1844
+[ablation_full_transition_without_query_conditioning] Epoch 15: loss=0.2246 val R@1=0.0997 MRR=0.1870
+[ablation_full_transition_without_query_conditioning] Epoch 16: loss=0.2131 val R@1=0.1035 MRR=0.1894
+[ablation_full_transition_without_query_conditioning] Epoch 17: loss=0.1970 val R@1=0.1025 MRR=0.1907
+[ablation_full_transition_without_query_conditioning] Epoch 18: loss=0.1877 val R@1=0.0998 MRR=0.1888
+[ablation_full_transition_without_query_conditioning] Epoch 19: loss=0.1773 val R@1=0.1032 MRR=0.1895
+[ablation_full_transition_without_query_conditioning] Epoch 20: loss=0.1698 val R@1=0.1029 MRR=0.1919
+[ablation_full_transition_without_query_conditioning] Epoch 21: loss=0.1613 val R@1=0.1007 MRR=0.1896
+[ablation_full_transition_without_query_conditioning] Epoch 22: loss=0.1546 val R@1=0.1032 MRR=0.1907
+[ablation_full_transition_without_query_conditioning] Epoch 23: loss=0.1482 val R@1=0.1036 MRR=0.1906
+[ablation_full_transition_without_query_conditioning] Epoch 24: loss=0.1436 val R@1=0.1006 MRR=0.1880
+[ablation_full_transition_without_query_conditioning] Epoch 25: loss=0.1373 val R@1=0.1036 MRR=0.1911
+[ablation_full_transition_without_query_conditioning] Early stop at epoch 25: no gain for 5 epochs
+[ablation_full_transition_without_query_conditioning] Best epoch 20 of 25
+{
+  "ablation_full_transition_without_query_conditioning_seed43": {
+    "full": {
+      "recall@1": 0.10364032609573008,
+      "recall@5": 0.2682218096698684,
+      "recall@10": 0.37412220518201633,
+      "mrr": 0.1904742270708084,
+      "map": 0.1904742270708084,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7713294051174429,
+      "recall@5": 0.9812737105496812,
+      "recall@10": 1.0,
+      "mrr": 0.8621823787689209,
+      "map": 0.8621823787689209,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.7397838122857896,
+      "recall@5": 0.9675718428684419,
+      "recall@10": 1.0,
+      "mrr": 0.8351433277130127,
+      "map": 0.8351433277130127,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_full_transition_without_query_conditioning_seed43.json
