@@ -1,0 +1,120 @@
+{
+  "action_contrast": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.8375301361083984,
+        "num_negatives": 34137,
+        "num_queries": 3793,
+        "pairwise_accuracy": 0.9300758707560711,
+        "recall@1": 0.7479567624571579
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 1.0
+      },
+      "negatives_by_type": {
+        "opposite_action": 34137
+      },
+      "num_negatives": 34137,
+      "num_queries": 3793,
+      "queries_with_opposite_action": 3793,
+      "queries_with_opposite_action_share": 1.0,
+      "queries_with_type": {
+        "opposite_action": 3793
+      }
+    },
+    "map": 0.8375301361083984,
+    "mrr": 0.8375301361083984,
+    "num_candidates": 10,
+    "num_queries": 3793,
+    "recall@1": 0.7479567624571579,
+    "recall@10": 1.0,
+    "recall@5": 0.9617716846823096
+  },
+  "action_contrast_skipped": 0,
+  "best_epoch": 16,
+  "checkpoint_path": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/transition_model_seed42_best.pt",
+  "command": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/src/models/baselines/vjepa_baseline.py --variant full_transition",
+  "epochs_run": 21,
+  "full": {
+    "map": 0.18300989270210266,
+    "mrr": 0.18300989270210266,
+    "num_candidates": 12389,
+    "num_queries": 12389,
+    "recall@1": 0.09653725078698845,
+    "recall@10": 0.36104608927274195,
+    "recall@5": 0.25990798288804584
+  },
+  "hard_negative": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.8476606011390686,
+        "num_negatives": 5390,
+        "num_queries": 1688,
+        "pairwise_accuracy": 0.837291280148423,
+        "recall@1": 0.7488151658767772
+      },
+      "other_action": {
+        "mrr": 0.9633625149726868,
+        "num_negatives": 27652,
+        "num_queries": 4085,
+        "pairwise_accuracy": 0.9860769564588456,
+        "recall@1": 0.9341493268053855
+      },
+      "same_objects": {
+        "mrr": 0.8696846961975098,
+        "num_negatives": 78459,
+        "num_queries": 10511,
+        "pairwise_accuracy": 0.943817790183408,
+        "recall@1": 0.7833698030634574
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "num_negatives": 111501,
+      "num_queries": 12389,
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392,
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      }
+    },
+    "map": 0.8615898489952087,
+    "mrr": 0.8615898489952087,
+    "num_candidates": 10,
+    "num_queries": 12389,
+    "recall@1": 0.7719751392364194,
+    "recall@10": 1.0,
+    "recall@5": 0.9806279764307047
+  },
+  "hard_negative_skipped": 0,
+  "model_name": "transition_model",
+  "query_conditioned": true,
+  "seed": 42,
+  "skipped_missing_features": 0,
+  "split": "test",
+  "timestamp": "2026-11-15T01:55:55.763852+00:00",
+  "training_summary": {
+    "best_epoch": 16,
+    "best_score": 0.18307781219482422,
+    "epochs_run": 21,
+    "max_epochs": 50,
+    "patience": 5,
+    "reached_epoch_limit_while_improving": false,
+    "stopped_early": true
+  },
+  "variant": "full_transition",
+  "video_input": "state_transition"
+}

@@ -213,8 +213,9 @@ tempCodeRunnerFile.py
 !/outputs/features/.gitkeep
 /outputs/checkpoints/*
 !/outputs/checkpoints/.gitkeep
-/outputs/results/*
-!/outputs/results/.gitkeep
+# Metrics JSON and CSV in outputs/results/ are small and tracked; per-query
+# rankings (~6 MB each) go to Drive only.
+/outputs/results/**/rankings_*.jsonl
 # Hugging Face downloads; re-downloaded on first use.
 /outputs/model_cache/
 # Slurm job logs and per-epoch training logs.
