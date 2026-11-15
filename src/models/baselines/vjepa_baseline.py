@@ -1,21 +1,29 @@
-"""B2 baseline (pooled V-JEPA, no transitions) and the transition ablations (T3.3).
+"""B2 baseline (pooled V-JEPA, no transitions) and the transition ablations (T2.7, T3.3).
 
 Every variant feeds a different view of the same cached V-JEPA states into the
-shared TransitionRetrievalModel, trains it with the main contrastive loss, and
-is scored with the shared evaluator. Only the video input, and for two variants
-the query-conditioned reranker, changes between runs:
+shared TransitionRetrievalModel, trains it with the main training protocol
+(fit_retrieval_model: same loss, epoch limit, early stopping, and selection
+metric), and is scored with the shared evaluator. Only the video input, and for
+two variants the query-conditioned reranker, changes between runs:
 
 - pooled: mean state as one token, no reranker (B2).
-- full_transition: the z[t + 1] - z[t] sequence with the reranker. This is the
-  main model; evaluate Quynh's checkpoint with it to get comparable rankings.
+- full_transition: [z[t], z[t + 1] - z[t]] tokens with the reranker. This is the
+  main model; it is trained by pipelines.train, and here only its checkpoint
+  is evaluated, to get rankings in the same format as the other variants. Its
+  metrics go to full_transition_seed<seed>.json; the main result file
+  transition_model_seed<seed>.json is written by pipelines.evaluate.
 - no_transition: the raw state sequence z[1:T] instead of transitions.
 - mean_transition: the mean transition vector as one token.
 - final_minus_initial: z[T] - z[1] as one token.
-- full_transition_without_query_conditioning: transitions, no reranker (B3).
+- full_transition_without_query_conditioning: the main model's [z, dz] tokens,
+  no reranker (B3).
 
 Note that the mean of z[t + 1] - z[t] telescopes to (z[T] - z[1]) / (T - 1), and
 the model's input LayerNorm removes that scale, so mean_transition and
 final_minus_initial see the same input up to a constant factor.
+
+Checkpoints, logs, results, and rankings are named <result_name>_seed<seed>,
+like the main model's.
 """
 
 import argparse
@@ -30,6 +38,7 @@ from config import (
     ANNOTATION_ROOT,
     CHECKPOINT_ROOT,
     FEATURE_ROOT,
+    LOG_ROOT,
     RANDOM_SEED,
     RESULT_ROOT,
     TEXT_MODEL_NAME,
@@ -47,17 +56,28 @@ from src.models.baselines.common import (
     split_hard_negative_rows,
 )
 from src.models.transition_model.encoder import encode_text_queries
-from src.models.transition_model.pipelines.evaluate import encode_row_texts
-from src.models.transition_model.pipelines.train import train_one_epoch
+from src.models.transition_model.pipelines.train import (
+    BATCH_SIZE,
+    LEARNING_RATE,
+    NUM_EPOCHS,
+    PATIENCE,
+    RUN_NAME as MAIN_RUN_NAME,
+    SELECTION_METRIC,
+    SELECTION_METRICS,
+    WEIGHT_DECAY,
+    checkpoint_path,
+    fit_retrieval_model,
+    log_path,
+)
 from src.models.transition_model.retrieval import (
     TransitionRetrievalModel,
     load_checkpoint,
-    save_checkpoint,
     score_transition_retrieval,
 )
 from src.models.transition_model.transition import compute_transitions
 from src.models.transition_model.utils import (
     collate_transitions,
+    encode_row_texts,
     ensure_dir,
     feature_path,
     get_device,
@@ -65,6 +85,7 @@ from src.models.transition_model.utils import (
     load_states,
     pad_sequences,
     set_random_seed,
+    unique_in_order,
 )
 
 
@@ -79,21 +100,18 @@ VARIANTS = {
     "final_minus_initial": True,
     "full_transition_without_query_conditioning": False,
 }
+# Variants that read the main model's [z, dz] tokens; the others are single-stream.
+STATE_TRANSITION_VARIANTS = ("full_transition", "full_transition_without_query_conditioning")
 ABLATION_VARIANTS = (
     "no_transition",
     "mean_transition",
     "final_minus_initial",
     "full_transition_without_query_conditioning",
 )
-MAIN_CHECKPOINT = CHECKPOINT_ROOT / "transition_model_best.pt"
-BATCH_SIZE = 128
 ENCODE_BATCH_SIZE = 256
-NUM_EPOCHS = 20
-LEARNING_RATE = 1e-4
-WEIGHT_DECAY = 0.01
 NUM_WORKERS = 0
-SELECTION_METRIC = "mrr"
 TEXT_ENCODER = "minilm"
+ACTION_CONTRAST_FILE = "action_contrast.jsonl"
 
 
 # Sub functions
@@ -103,8 +121,20 @@ def result_name(variant: str) -> str:
     if variant == "pooled":
         return "vjepa_baseline"
     if variant == "full_transition":
-        return "transition_model"
+        return MAIN_RUN_NAME
     return f"ablation_{variant}"
+
+
+def variant_video_input(variant: str) -> str:
+    """Return the TransitionRetrievalModel video_input a variant is trained with."""
+    if variant not in VARIANTS:
+        raise ValueError(f"unknown variant: {variant}")
+    return "state_transition" if variant in STATE_TRANSITION_VARIANTS else "transition"
+
+
+def main_checkpoint_path(checkpoint_dir: Path = CHECKPOINT_ROOT, seed: int = RANDOM_SEED) -> Path:
+    """Return the main model's best checkpoint for one seed, as pipelines.train saves it."""
+    return checkpoint_path(checkpoint_dir, MAIN_RUN_NAME, seed)
 
 
 def variant_sequence(
@@ -112,7 +142,7 @@ def variant_sequence(
     state_embeddings: np.ndarray,
     transition_embeddings: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Return the (L, D) video input one variant feeds to the retrieval model."""
+    """Return the (L, D) or (L, 2D) video input one variant feeds to the retrieval model."""
     states = np.asarray(state_embeddings, dtype=np.float32)
     if states.ndim != 2 or states.shape[0] < 2:
         raise ValueError("state_embeddings must have shape (T, D) with T >= 2")
@@ -127,8 +157,8 @@ def variant_sequence(
         if transition_embeddings is None
         else np.asarray(transition_embeddings, dtype=np.float32)
     )
-    if variant in ("full_transition", "full_transition_without_query_conditioning"):
-        return transitions
+    if variant in STATE_TRANSITION_VARIANTS:
+        return np.concatenate((states[:-1], transitions), axis=1).astype(np.float32)
     if variant == "mean_transition":
         return transitions.mean(axis=0, keepdims=True)
     raise ValueError(f"unknown variant: {variant}")
@@ -199,7 +229,7 @@ def build_variant_loader(
     seed: int,
 ) -> tuple[DataLoader, list[str]]:
     """Return a shuffled loader of (variant sequence, text id) and the unique texts."""
-    texts = list(dict.fromkeys(row["text_query"] for row in rows))
+    texts = unique_in_order(row["text_query"] for row in rows)
     text_index = {text: i for i, text in enumerate(texts)}
     dataset = VariantDataset(
         variant,
@@ -219,6 +249,35 @@ def build_variant_loader(
     return loader, texts
 
 
+def evaluate_candidate_file(
+    model: TransitionRetrievalModel,
+    variant: str,
+    path: Path | None,
+    rows: list[dict],
+    texts: np.ndarray,
+    feature_dir: Path,
+) -> tuple[dict | None, int]:
+    """Score one hard-negative-schema file; (None, 0) when it is missing or empty."""
+    candidate_rows = read_hard_negative_rows(path, rows)
+    available = {
+        v for v in hard_negative_video_ids(candidate_rows) if feature_path(feature_dir, v).exists()
+    }
+    kept, skipped = split_hard_negative_rows(candidate_rows, available)
+    if not kept:
+        return None, skipped
+    video_ids = hard_negative_video_ids(kept)
+    videos = encode_variant_bank(model, variant, video_ids, feature_dir)
+    metrics = evaluate_hard_negatives(
+        kept,
+        rows,
+        texts,
+        video_ids,
+        videos,
+        lambda text, candidates: score_transition_retrieval(text, candidates, model),
+    )
+    return metrics, skipped
+
+
 # Main functions
 
 def train_variant_model(
@@ -228,28 +287,35 @@ def train_variant_model(
     feature_dir: Path,
     checkpoint_dir: Path,
     *,
+    log_dir: Path = LOG_ROOT,
     epochs: int = NUM_EPOCHS,
+    patience: int | None = PATIENCE,
     batch_size: int = BATCH_SIZE,
     learning_rate: float = LEARNING_RATE,
+    weight_decay: float = WEIGHT_DECAY,
+    selection_metric: str = SELECTION_METRIC,
     text_encoder: str = TEXT_ENCODER,
     text_model_name: str = TEXT_MODEL_NAME,
     device: str | None = None,
     limit: int | None = None,
     seed: int = RANDOM_SEED,
 ) -> Path:
-    """Train one baseline/ablation variant and return its best checkpoint path."""
+    """Train one baseline/ablation variant with the main training protocol.
+
+    Returns `<checkpoint_dir>/<result_name>_seed<seed>_best.pt`; the per-epoch log
+    goes to `<log_dir>/<result_name>_seed<seed>_train_log.jsonl`.
+    """
     if variant == "full_transition":
         raise ValueError(
             "train the main model with src.models.transition_model.pipelines.train"
         )
-    if variant not in VARIANTS:
-        raise ValueError(f"unknown variant: {variant}")
+    video_input = variant_video_input(variant)
+    if selection_metric not in SELECTION_METRICS:
+        raise ValueError(f"selection_metric must be one of {SELECTION_METRICS}")
     set_random_seed(seed)
     device = get_device(device)
     checkpoint_dir = ensure_dir(checkpoint_dir)
     name = result_name(variant)
-    best_path = checkpoint_dir / f"{name}_best.pt"
-    log_path = checkpoint_dir / f"{name}_train_log.jsonl"
 
     train_rows, train_skipped = load_split_rows(train_annotations, feature_dir, limit)
     val_rows, val_skipped = load_split_rows(val_annotations, feature_dir, limit)
@@ -268,35 +334,48 @@ def train_variant_model(
 
     video_dim = load_states(feature_dir, str(train_rows[0]["target_video_id"])).shape[1]
     model = TransitionRetrievalModel(
-        video_dim, text_bank.shape[1], query_conditioned=VARIANTS[variant]
+        video_dim,
+        text_bank.shape[1],
+        query_conditioned=VARIANTS[variant],
+        video_input=video_input,
     ).to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=WEIGHT_DECAY)
 
-    best_score = float("-inf")
-    log_path.write_text("", encoding="utf-8")
-    for epoch in range(1, epochs + 1):
-        loss = train_one_epoch(model, loader, text_bank, optimizer)
-        _, _, metrics = score_variant_rows(model, variant, val_rows, val_texts, feature_dir)
-        with log_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps({"epoch": epoch, "train_loss": loss, "val": metrics}) + "\n")
-        print(
-            f"[{name}] epoch {epoch}: loss={loss:.4f} "
-            f"val R@1={metrics['recall@1']:.4f} MRR={metrics['mrr']:.4f}"
-        )
-        if metrics[SELECTION_METRIC] > best_score:
-            best_score = metrics[SELECTION_METRIC]
-            save_checkpoint(
-                model,
-                best_path,
-                variant=variant,
-                epoch=epoch,
-                val_metrics=metrics,
-                selection_metric=SELECTION_METRIC,
-                text_encoder=text_encoder,
-                text_model_name=text_model_name,
-                feature_dir=str(feature_dir),
-                seed=seed,
-            )
+    best_path = checkpoint_path(checkpoint_dir, name, seed)
+    fit_retrieval_model(
+        model,
+        loader,
+        text_bank,
+        lambda m: score_variant_rows(m, variant, val_rows, val_texts, feature_dir)[2],
+        best_path,
+        log_path(log_dir, name, seed),
+        epochs=epochs,
+        patience=patience,
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
+        selection_metric=selection_metric,
+        checkpoint_metadata={
+            "variant": variant,
+            "text_encoder": text_encoder,
+            "text_model_name": text_model_name,
+            "feature_dir": str(feature_dir),
+            "seed": seed,
+            "train_config": {
+                "run_name": name,
+                "epochs": epochs,
+                "patience": patience,
+                "video_input": video_input,
+                "seed": seed,
+                "batch_size": batch_size,
+                "learning_rate": learning_rate,
+                "weight_decay": weight_decay,
+                "selection_metric": selection_metric,
+                "train_annotations": str(train_annotations),
+                "val_annotations": str(val_annotations),
+                "limit": limit,
+            },
+        },
+        log_prefix=f"[{name}] ",
+    )
     return best_path
 
 
@@ -372,15 +451,21 @@ def evaluate_variant(
     output_path: Path,
     *,
     hard_negatives: Path | None = None,
+    action_contrast: Path | None = None,
     rankings_path: Path | None = None,
     device: str | None = None,
     limit: int | None = None,
 ) -> dict:
-    """Evaluate one variant checkpoint on full and hard-negative retrieval and save results."""
+    """Evaluate one variant checkpoint on full, hard-negative, and action-contrast retrieval."""
     device = get_device(device)
     model, checkpoint = load_checkpoint(checkpoint_path, device)
     if checkpoint["model_config"]["query_conditioned"] != VARIANTS[variant]:
         raise ValueError(f"checkpoint reranker setting does not match variant {variant}")
+    if model.video_input != variant_video_input(variant):
+        raise ValueError(
+            f"checkpoint video_input {model.video_input!r} does not match variant {variant} "
+            f"({variant_video_input(variant)!r})"
+        )
     rows, skipped = load_split_rows(annotations, feature_dir, limit)
     if not rows:
         raise ValueError(f"no annotation rows with cached features in {feature_dir}")
@@ -388,32 +473,27 @@ def evaluate_variant(
     scores, candidates, full = score_variant_rows(model, variant, rows, texts, feature_dir)
 
     name = result_name(variant)
+    summary = checkpoint.get("training_summary") or {}
     result = build_result(
         name,
         rows,
         full,
         variant=variant,
         checkpoint_path=str(checkpoint_path),
+        seed=checkpoint.get("seed"),
+        best_epoch=summary.get("best_epoch", checkpoint.get("epoch")),
+        epochs_run=summary.get("epochs_run"),
+        training_summary=summary or None,
+        video_input=model.video_input,
         query_conditioned=VARIANTS[variant],
         skipped_missing_features=skipped,
     )
-    hard_rows = read_hard_negative_rows(hard_negatives, rows)
-    available = {
-        v for v in hard_negative_video_ids(hard_rows) if feature_path(feature_dir, v).exists()
-    }
-    kept, hard_skipped = split_hard_negative_rows(hard_rows, available)
-    if kept:
-        video_ids = hard_negative_video_ids(kept)
-        videos = encode_variant_bank(model, variant, video_ids, feature_dir)
-        result["hard_negative"] = evaluate_hard_negatives(
-            kept,
-            rows,
-            texts,
-            video_ids,
-            videos,
-            lambda text, candidates: score_transition_retrieval(text, candidates, model),
+    for key, path in (("hard_negative", hard_negatives), ("action_contrast", action_contrast)):
+        metrics, set_skipped = evaluate_candidate_file(
+            model, variant, path, rows, texts, feature_dir
         )
-        result["hard_negative_skipped"] = hard_skipped
+        result[key] = metrics
+        result[f"{key}_skipped"] = set_skipped
 
     save_metrics(result, output_path)
     if rankings_path is not None:
@@ -435,66 +515,102 @@ def main() -> None:
     parser.add_argument("--test-annotations", type=Path, default=ANNOTATION_ROOT / "test.jsonl")
     parser.add_argument("--feature-dir", type=Path, default=FEATURE_ROOT / "vjepa")
     parser.add_argument("--checkpoint-dir", type=Path, default=CHECKPOINT_ROOT)
+    parser.add_argument("--log-dir", type=Path, default=LOG_ROOT)
     parser.add_argument(
         "--checkpoint",
         type=Path,
         default=None,
-        help="evaluate this checkpoint instead of training (one variant only)",
+        help="evaluate this checkpoint instead of training (one variant and one seed only)",
     )
     parser.add_argument(
         "--hard-negatives", type=Path, default=ANNOTATION_ROOT / "hard_negatives.jsonl"
     )
+    parser.add_argument(
+        "--action-contrast", type=Path, default=ANNOTATION_ROOT / ACTION_CONTRAST_FILE
+    )
     parser.add_argument("--result-dir", type=Path, default=RESULT_ROOT)
-    parser.add_argument("--epochs", type=int, default=NUM_EPOCHS)
+    parser.add_argument("--epochs", type=int, default=NUM_EPOCHS, help="epoch limit")
+    parser.add_argument(
+        "--patience",
+        type=int,
+        default=PATIENCE,
+        help="stop after this many epochs without validation gain; 0 disables",
+    )
     parser.add_argument("--batch-size", type=int, default=BATCH_SIZE)
     parser.add_argument("--learning-rate", type=float, default=LEARNING_RATE)
+    parser.add_argument("--weight-decay", type=float, default=WEIGHT_DECAY)
+    parser.add_argument(
+        "--selection-metric", choices=SELECTION_METRICS, default=SELECTION_METRIC
+    )
     parser.add_argument("--text-encoder", choices=("minilm", "mock"), default=TEXT_ENCODER)
     parser.add_argument("--device", default=None)
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        nargs="+",
+        default=[RANDOM_SEED],
+        help="one training run (or main checkpoint) per seed",
+    )
     args = parser.parse_args()
 
     variants = []
     for variant in args.variant:
         variants.extend(ABLATION_VARIANTS if variant == "all_ablations" else [variant])
     variants = list(dict.fromkeys(variants))
-    if args.checkpoint is not None and len(variants) != 1:
-        parser.error("--checkpoint needs exactly one variant")
+    if args.checkpoint is not None and (len(variants) != 1 or len(args.seeds) != 1):
+        parser.error("--checkpoint needs exactly one variant and one seed")
 
     for variant in variants:
-        checkpoint = args.checkpoint
-        if checkpoint is None and variant == "full_transition":
-            checkpoint = MAIN_CHECKPOINT
-        if checkpoint is None:
-            checkpoint = train_variant_model(
+        for seed in args.seeds:
+            checkpoint = args.checkpoint
+            if checkpoint is None and variant == "full_transition":
+                checkpoint = main_checkpoint_path(args.checkpoint_dir, seed)
+                if not checkpoint.exists():
+                    parser.error(f"missing main checkpoint: {checkpoint}")
+            if checkpoint is None:
+                checkpoint = train_variant_model(
+                    variant,
+                    args.train_annotations,
+                    args.val_annotations,
+                    args.feature_dir,
+                    args.checkpoint_dir,
+                    log_dir=args.log_dir,
+                    epochs=args.epochs,
+                    patience=args.patience or None,
+                    batch_size=args.batch_size,
+                    learning_rate=args.learning_rate,
+                    weight_decay=args.weight_decay,
+                    selection_metric=args.selection_metric,
+                    text_encoder=args.text_encoder,
+                    device=args.device,
+                    limit=args.limit,
+                    seed=seed,
+                )
+            stem = f"{result_name(variant)}_seed{seed}"
+            # pipelines.evaluate owns <main run>_seed<seed>.json, so the main model's
+            # result from this runner goes to its own file.
+            output_stem = f"full_transition_seed{seed}" if variant == "full_transition" else stem
+            output = args.result_dir / f"{output_stem}.json"
+            result = evaluate_variant(
                 variant,
-                args.train_annotations,
-                args.val_annotations,
+                checkpoint,
+                args.test_annotations,
                 args.feature_dir,
-                args.checkpoint_dir,
-                epochs=args.epochs,
-                batch_size=args.batch_size,
-                learning_rate=args.learning_rate,
-                text_encoder=args.text_encoder,
+                output,
+                hard_negatives=args.hard_negatives,
+                action_contrast=args.action_contrast,
+                rankings_path=args.result_dir / f"rankings_{stem}.jsonl",
                 device=args.device,
                 limit=args.limit,
-                seed=args.seed,
             )
-        name = result_name(variant)
-        output = args.result_dir / f"{name}.json"
-        result = evaluate_variant(
-            variant,
-            checkpoint,
-            args.test_annotations,
-            args.feature_dir,
-            output,
-            hard_negatives=args.hard_negatives,
-            rankings_path=args.result_dir / f"rankings_{name}.jsonl",
-            device=args.device,
-            limit=args.limit,
-        )
-        print(json.dumps({name: {"full": result["full"], "hard_negative": result["hard_negative"]}}, indent=2))
-        print(f"Saved results to {output}")
+            summary = {
+                key: result[key]
+                and {k: v for k, v in result[key].items() if k not in ("by_negative_type", "coverage")}
+                for key in ("full", "hard_negative", "action_contrast")
+            }
+            print(json.dumps({stem: summary}, indent=2))
+            print(f"Saved results to {output}")
 
 
 if __name__ == "__main__":

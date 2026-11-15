@@ -206,14 +206,31 @@ cython_debug/
 tempCodeRunnerFile.py
 .DS_Store
 
-# Project-local datasets and generated artifacts
+# Project-local datasets and generated artifacts.
+# Large artifacts are shared through Google Drive (see README "Shared artifacts").
 /data/
-outputs/features/*
-!outputs/features/.gitkeep
-outputs/checkpoints/*
-!outputs/checkpoints/.gitkeep
-outputs/results/*
-!outputs/results/.gitkeep
+/outputs/features/*
+!/outputs/features/.gitkeep
+/outputs/checkpoints/*
+!/outputs/checkpoints/.gitkeep
+/outputs/results/*
+!/outputs/results/.gitkeep
+# Hugging Face downloads; re-downloaded on first use.
+/outputs/model_cache/
+# Slurm job logs and per-epoch training logs.
+/logs/
+# Drive upload archive (scripts/pack_artifacts.sbatch).
+/artifacts/
+
+# LaTeX build files for paper/
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.fdb_latexmk
+paper/**/*.fls
+paper/**/*.out
+paper/**/*.synctex.gz
+paper/**/*.toc
 
 # Ruff stuff:
 .ruff_cache/
@@ -228,4 +245,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-outputs/model_cache/

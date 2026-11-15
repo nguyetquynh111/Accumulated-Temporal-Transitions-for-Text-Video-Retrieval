@@ -316,11 +316,16 @@ def sample_ordered_frame_indices(
     return np.rint(indices).astype(np.int64)
 
 
-def load_video_frames(
+def _decode_video_frames(
     video_path: Path,
-    frame_indices: np.ndarray
-) -> np.ndarray:
-    """Return RGB frames with shape (T, H, W, 3), dtype uint8."""
+    stop_after: int | None = None,
+) -> list[np.ndarray]:
+    """Decode RGB frames in order, stopping after index stop_after if given.
+
+    Frames are read sequentially instead of seeking. Seeking is slow for VP9
+    WebM, and the frame count stored in SSv2 files is sometimes larger than
+    the number of frames that can actually be decoded.
+    """
 
     import cv2
 
@@ -342,19 +347,11 @@ def load_video_frames(
     frames = []
 
     try:
-        for index in frame_indices.astype(np.int64):
-
-            capture.set(
-                cv2.CAP_PROP_POS_FRAMES,
-                int(index)
-            )
-
+        while stop_after is None or len(frames) <= stop_after:
             ok, frame_bgr = capture.read()
 
             if not ok:
-                raise ValueError(
-                    f"Could not read frame {int(index)} from {video_path}"
-                )
+                break
 
             frames.append(
                 cv2.cvtColor(
@@ -366,8 +363,35 @@ def load_video_frames(
     finally:
         capture.release()
 
+    if not frames:
+        raise ValueError(
+            f"Video has no readable frames: {video_path}"
+        )
+
+    return frames
+
+
+def load_video_frames(
+    video_path: Path,
+    frame_indices: np.ndarray
+) -> np.ndarray:
+    """Return RGB frames with shape (T, H, W, 3), dtype uint8."""
+
+    frame_indices = np.asarray(frame_indices, dtype=np.int64)
+
+    if frame_indices.size == 0 or frame_indices.min() < 0:
+        raise ValueError("frame_indices must be nonempty and nonnegative")
+
+    last_index = int(frame_indices.max())
+    frames = _decode_video_frames(video_path, stop_after=last_index)
+
+    if last_index >= len(frames):
+        raise ValueError(
+            f"Could not read frame {last_index} from {video_path}"
+        )
+
     return np.stack(
-        frames,
+        [frames[index] for index in frame_indices],
         axis=0
     ).astype(np.uint8)
 
@@ -381,19 +405,19 @@ def get_dataset_sample(
 
     _validate_annotation_row(row)
 
-    video_path = Path(row["video_path"])
-
-    total_frames = _get_total_frames(video_path)
+    # Decode once and sample from the frames that actually decode, since the
+    # frame count in the file header can overstate the real length.
+    decoded = _decode_video_frames(Path(row["video_path"]))
 
     frame_indices = sample_ordered_frame_indices(
-        total_frames,
+        len(decoded),
         num_frames
     )
 
-    frames = load_video_frames(
-        video_path,
-        frame_indices
-    )
+    frames = np.stack(
+        [decoded[index] for index in frame_indices],
+        axis=0
+    ).astype(np.uint8)
 
     # Apply an optional transformation while keeping the shared frame format.
     if transform is not None:

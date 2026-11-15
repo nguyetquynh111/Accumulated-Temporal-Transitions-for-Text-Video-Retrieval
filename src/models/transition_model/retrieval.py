@@ -1,6 +1,9 @@
 """Transition-aware retrieval model with a query-conditioned reranker.
 
-Each text query is projected into the transition space. A video's score is the
+Videos are encoded from [z, dz] tokens by default (video_input
+"state_transition"); video_input "transition" feeds dz alone, and is also the
+single-stream layout used by the baseline runners and by older checkpoints,
+whose config has no video_input. Each text query is projected into the video space. A video's score is the
 scaled cosine similarity plus a reranker logit computed from the interaction of
 that specific query and video. Setting query_conditioned=False drops the
 reranker, which gives the "reranker without query conditioning" ablation.
@@ -13,14 +16,17 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torch.utils.data import DataLoader
 
 from src.models.transition_model.transition import (
     DROPOUT,
     MODEL_DIM,
     NUM_HEADS,
     NUM_LAYERS,
+    VIDEO_INPUTS,
     TransitionEncoder,
 )
+from src.models.transition_model.utils import TransitionDataset, collate_transitions
 
 
 # Config
@@ -28,6 +34,7 @@ from src.models.transition_model.transition import (
 RERANK_HIDDEN_DIM = 512
 INITIAL_TEMPERATURE = 0.07
 SCORE_CHUNK_SIZE = 256
+ENCODE_BATCH_SIZE = 256
 
 
 # Sub functions
@@ -45,8 +52,12 @@ class TransitionRetrievalModel(nn.Module):
         dropout: float = DROPOUT,
         rerank_hidden_dim: int = RERANK_HIDDEN_DIM,
         query_conditioned: bool = True,
+        video_input: str = "transition",
     ):
+        """video_dim is the state dimension D; [z, dz] tokens have width 2D."""
         super().__init__()
+        if video_input not in VIDEO_INPUTS:
+            raise ValueError(f"video_input must be one of {VIDEO_INPUTS}")
         self.config = {
             "video_dim": video_dim,
             "text_dim": text_dim,
@@ -56,10 +67,21 @@ class TransitionRetrievalModel(nn.Module):
             "dropout": dropout,
             "rerank_hidden_dim": rerank_hidden_dim,
             "query_conditioned": query_conditioned,
+            "video_input": video_input,
         }
-        self.video_encoder = TransitionEncoder(
-            video_dim, model_dim, num_heads, num_layers, dropout
-        )
+        if video_input == "state_transition":
+            self.video_encoder = TransitionEncoder(
+                2 * video_dim,
+                model_dim,
+                num_heads,
+                num_layers,
+                dropout,
+                input_groups=(video_dim, video_dim),
+            )
+        else:
+            self.video_encoder = TransitionEncoder(
+                video_dim, model_dim, num_heads, num_layers, dropout
+            )
         self.text_projection = nn.Sequential(
             nn.Linear(text_dim, model_dim), nn.LayerNorm(model_dim)
         )
@@ -73,9 +95,13 @@ class TransitionRetrievalModel(nn.Module):
                 nn.Linear(rerank_hidden_dim, 1),
             )
 
-    def encode_videos(self, transitions: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    @property
+    def video_input(self) -> str:
+        return self.config["video_input"]
+
+    def encode_videos(self, tokens: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         """Return L2-normalized video representations (B, model_dim)."""
-        return F.normalize(self.video_encoder(transitions, mask), dim=-1)
+        return F.normalize(self.video_encoder(tokens, mask), dim=-1)
 
     def encode_texts(self, text_embeddings: torch.Tensor) -> torch.Tensor:
         """Return L2-normalized text representations (N, model_dim)."""
@@ -119,6 +145,33 @@ def load_checkpoint(
     model = TransitionRetrievalModel(**checkpoint["model_config"])
     model.load_state_dict(checkpoint["state_dict"])
     return model.to(device).eval(), checkpoint
+
+
+def encode_video_bank(
+    model: TransitionRetrievalModel,
+    video_ids: list[str],
+    feature_dir: Path,
+    batch_size: int = ENCODE_BATCH_SIZE,
+    num_workers: int = 0,
+) -> np.ndarray:
+    """Return encoded video representations (N, model_dim) in video_ids order."""
+    dataset = TransitionDataset(
+        video_ids, list(range(len(video_ids))), feature_dir, model.video_input
+    )
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        collate_fn=collate_transitions,
+    )
+    model.eval()
+    device = next(model.parameters()).device
+    chunks = []
+    with torch.inference_mode():
+        for tokens, mask, _ in loader:
+            videos = model.encode_videos(tokens.to(device), mask.to(device))
+            chunks.append(videos.float().cpu().numpy())
+    return np.concatenate(chunks)
 
 
 # Main functions

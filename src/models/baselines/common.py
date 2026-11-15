@@ -9,7 +9,7 @@ from typing import Callable
 import numpy as np
 
 from config import PROJECT_ROOT
-from src.eval.evaluate import compute_hard_negative_metrics, compute_retrieval_metrics
+from src.eval.evaluate import compute_retrieval_metrics, summarize_candidate_set
 
 
 # Config
@@ -111,6 +111,9 @@ def evaluate_hard_negatives(
 ) -> dict:
     """Score each hard-negative row against only its own candidates.
 
+    Returns aggregate metrics plus per-negative-type metrics and coverage when
+    the rows carry negative_types.
+
     score_fn maps text embeddings (1, D_text) and candidate embeddings (n, D)
     to scores (1, n), so every model can reuse this with its own scorer.
     """
@@ -125,7 +128,7 @@ def evaluate_hard_negatives(
             video_embeddings[[video_index[v] for v in candidates]],
         )[0]
         score_lookup.update({(query_id, v): float(s) for v, s in zip(candidates, scores)})
-    return compute_hard_negative_metrics(hard_rows, score_lookup)
+    return summarize_candidate_set(hard_rows, score_lookup)
 
 
 def ranking_records(

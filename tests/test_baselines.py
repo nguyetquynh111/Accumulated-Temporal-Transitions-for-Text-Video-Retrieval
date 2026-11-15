@@ -23,11 +23,15 @@ from src.models.baselines.error_analysis import (
 from src.models.baselines.vjepa_baseline import (
     ABLATION_VARIANTS,
     evaluate_variant,
+    main_checkpoint_path,
+    result_name,
     run_transition_ablation,
     score_vjepa_baseline,
     train_variant_model,
     variant_sequence,
+    variant_video_input,
 )
+from src.models.transition_model.pipelines.train import train_transition_model
 from src.models.transition_model.encoder import save_video_feature_cache
 
 
@@ -110,7 +114,10 @@ class VjepaBaselineTests(unittest.TestCase):
         states = np.array([[0, 0], [1, 2], [4, 4]], dtype=np.float32)
         self.assertEqual(variant_sequence("pooled", states).shape, (1, 2))
         np.testing.assert_array_equal(variant_sequence("no_transition", states), states)
-        np.testing.assert_array_equal(variant_sequence("full_transition", states), [[1, 2], [3, 2]])
+        # The main model's tokens [z[t], z[t + 1] - z[t]].
+        np.testing.assert_array_equal(
+            variant_sequence("full_transition", states), [[0, 0, 1, 2], [1, 2, 3, 2]]
+        )
         np.testing.assert_array_equal(variant_sequence("final_minus_initial", states), [[4, 4]])
         np.testing.assert_array_equal(variant_sequence("mean_transition", states), [[2, 2]])
         with self.assertRaises(ValueError):
@@ -119,7 +126,7 @@ class VjepaBaselineTests(unittest.TestCase):
     def test_untrained_scoring_keeps_candidate_order(self):
         states = {"a": np.array([[0, 0], [1, 0]]), "b": np.array([[0, 0], [0, 1]])}
         texts = np.array([[1, 0], [0, 1]], dtype=np.float32)
-        scores = run_transition_ablation("full_transition", texts, states, {})
+        scores = run_transition_ablation("final_minus_initial", texts, states, {})
         np.testing.assert_array_equal(scores, [[1, 0], [0, 1]])
         np.testing.assert_array_equal(score_vjepa_baseline(texts, texts), np.eye(2))
 
@@ -142,6 +149,19 @@ class VjepaBaselineTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+            contrast = root / "action_contrast.jsonl"
+            contrast.write_text(
+                json.dumps(
+                    {
+                        "query_id": "val_q0",
+                        "target_video_id": "v8",
+                        "candidate_video_ids": ["v9", "v8"],
+                        "negative_types": ["opposite_action"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
             for variant in ("pooled", *ABLATION_VARIANTS):
                 checkpoint = train_variant_model(
                     variant,
@@ -149,10 +169,15 @@ class VjepaBaselineTests(unittest.TestCase):
                     val,
                     features,
                     root / "checkpoints",
-                    epochs=1,
+                    log_dir=root / "logs",
+                    epochs=2,
                     batch_size=4,
                     text_encoder="mock",
                     device="cpu",
+                )
+                self.assertEqual(checkpoint.name, f"{result_name(variant)}_seed42_best.pt")
+                self.assertTrue(
+                    (root / "logs" / f"{result_name(variant)}_seed42_train_log.jsonl").exists()
                 )
                 result = evaluate_variant(
                     variant,
@@ -161,18 +186,40 @@ class VjepaBaselineTests(unittest.TestCase):
                     features,
                     root / f"{variant}.json",
                     hard_negatives=hard,
+                    action_contrast=contrast,
                     rankings_path=root / f"rankings_{variant}.jsonl",
                     device="cpu",
                 )
                 self.assertEqual(result["variant"], variant)
+                self.assertEqual(result["seed"], 42)
+                self.assertEqual(result["epochs_run"], 2)
+                self.assertEqual(result["video_input"], variant_video_input(variant))
                 self.assertEqual(result["full"]["num_candidates"], 4)
                 self.assertEqual(result["hard_negative"]["num_queries"], 1)
+                self.assertEqual(result["action_contrast"]["num_queries"], 1)
+                self.assertEqual(
+                    result["action_contrast"]["by_negative_type"]["opposite_action"]["num_negatives"], 1
+                )
                 self.assertEqual(len(load_jsonl(root / f"rankings_{variant}.jsonl")), 4)
+
+            # The main model trained by pipelines.train is evaluated as full_transition.
+            main = train_transition_model(
+                train, val, features, root / "checkpoints", log_dir=root / "logs",
+                epochs=1, batch_size=4, text_encoder="mock", device="cpu",
+            )
+            self.assertEqual(main, main_checkpoint_path(root / "checkpoints", 42))
+            result = evaluate_variant(
+                "full_transition", main, val, features, root / "main.json",
+                action_contrast=contrast, device="cpu",
+            )
+            self.assertEqual(result["model_name"], "transition_model")
+            self.assertEqual(result["video_input"], "state_transition")
+            self.assertEqual(result["full"]["num_candidates"], 4)
 
             with self.assertRaisesRegex(ValueError, "does not match"):
                 evaluate_variant(
                     "pooled",
-                    root / "checkpoints" / "ablation_no_transition_best.pt",
+                    root / "checkpoints" / "ablation_no_transition_seed42_best.pt",
                     val,
                     features,
                     root / "bad.json",

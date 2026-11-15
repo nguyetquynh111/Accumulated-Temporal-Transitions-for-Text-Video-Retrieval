@@ -16,7 +16,26 @@ from src.models.transition_model.encoder import (
     load_video_feature_cache,
     save_video_feature_cache,
 )
-from src.models.transition_model.pipelines.extract_features import extract_features
+from src.models.transition_model.pipelines.extract_features import (
+    extract_features,
+    select_video_rows,
+)
+
+
+def write_annotations(path: Path, video_ids: list[str]) -> Path:
+    rows = [
+        {
+            "query_id": f"{path.stem}_q{i}",
+            "video_id": vid,
+            "video_path": f"data/videos/{vid}.webm",
+            "text_query": "action",
+            "target_video_id": vid,
+            "split": path.stem,
+        }
+        for i, vid in enumerate(video_ids)
+    ]
+    path.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
+    return path
 
 
 class EncoderPipelineTests(unittest.TestCase):
@@ -97,6 +116,57 @@ class EncoderPipelineTests(unittest.TestCase):
                         num_frames=16,
                         encoder_name="mock",
                     )
+
+    def test_batch_encoding_matches_single_video_encoding(self):
+        rng = np.random.default_rng(0)
+        videos = [
+            rng.integers(0, 256, size=(8, 4, width, 3), dtype=np.uint8) for width in (4, 6)
+        ]
+        encoder = VideoEncoder(encoder_name="mock")
+        batch = encoder.encode_batch(videos)
+        self.assertEqual(len(batch), 2)
+        for frames, states in zip(videos, batch):
+            np.testing.assert_array_equal(states, encoder.encode(frames))
+        self.assertEqual(encoder.encode_batch([]), [])
+
+    def test_shards_partition_the_videos(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            first = write_annotations(root / "train.jsonl", ["v1", "v2", "v1", "v3"])
+            second = write_annotations(root / "val.jsonl", ["v3", "v4", "v5"])
+            everything = select_video_rows([first, second])
+            self.assertEqual(list(everything), ["v1", "v2", "v3", "v4", "v5"])
+            shards = [select_video_rows([first, second], None, 2, i) for i in range(2)]
+            self.assertEqual(list(shards[0]), ["v1", "v3", "v5"])
+            self.assertEqual(list(shards[1]), ["v2", "v4"])
+            with self.assertRaisesRegex(ValueError, "shard_index"):
+                select_video_rows(first, None, 2, 2)
+
+    def test_unreadable_videos_are_logged_and_skipped(self):
+        def fake_sample(row, num_frames):
+            if row["video_id"] == "v2":
+                raise FileNotFoundError(row["video_path"])
+            return {
+                "frame_indices": np.arange(num_frames),
+                "frames": np.zeros((num_frames, 2, 2, 3), dtype=np.uint8),
+            }
+
+        target = "src.models.transition_model.pipelines.extract_features.get_dataset_sample"
+        with tempfile.TemporaryDirectory() as tmp, patch(target, side_effect=fake_sample):
+            root = Path(tmp)
+            annotations = write_annotations(root / "train.jsonl", ["v1", "v2", "v3"])
+            options = dict(num_frames=8, encoder_name="mock", batch_size=2)
+            paths = extract_features(annotations, root / "features", **options)
+            self.assertEqual([path.stem for path in paths], ["v1", "v3"])
+            self.assertTrue(all(path.exists() for path in paths))
+            self.assertEqual(
+                sorted(path.name for path in (root / "features").iterdir()),
+                ["extract_failures.jsonl", "v1.npz", "v3.npz"],
+            )
+            failures = (root / "features" / "extract_failures.jsonl").read_text()
+            self.assertEqual(json.loads(failures)["video_id"], "v2")
+            with self.assertRaisesRegex(ValueError, "v2"):
+                extract_features(annotations, root / "features", strict=True, **options)
 
     def test_relative_config_env_path_uses_project_root(self):
         env = dict(os.environ, ATTVR_OUTPUT_ROOT="relative_outputs")

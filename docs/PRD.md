@@ -71,9 +71,15 @@ This produces the transition sequence:
 [\Delta z_1, \Delta z_2, ..., \Delta z_{T-1}]
 \]
 
-### 3.4 Transition Sequence Encoding
+### 3.4 State and Transition Sequence Encoding
 
-Encode the transition sequence using a temporal module such as temporal attention.
+Encode states and transitions together with a temporal module such as temporal
+attention. Token `t` is the concatenation `[z_t, Δz_t]` for `t = 1, ..., T-1`.
+
+Transitions alone remove scene content (objects, background) that the text
+queries name explicitly, so the model must also see the states. The claim being
+tested is that adding explicit transitions to states helps, not that
+transitions can replace states.
 
 The output should summarize how the video evolves over time.
 
@@ -135,6 +141,14 @@ Examples:
 
 The hard-negative benchmark should test whether temporal transitions provide information beyond static appearance.
 
+Hard-negative results must be reported per negative type (opposite action, same
+objects, other action) as well as in aggregate. Negatives added only to fill a
+candidate set do not test temporal direction, and an aggregate dominated by
+them can hide the effect the benchmark is meant to measure.
+
+An action-contrast subset, whose negatives are all opposite-action videos, is
+the primary hard-negative setting.
+
 ---
 
 ## 6. Baselines
@@ -158,12 +172,21 @@ The hard-negative benchmark should test whether temporal transitions provide inf
 ### B4 — Transition Ablation
 
 Remove or replace the latent transition sequence to measure its contribution.
+Every variant uses the same sequence encoder, reranker, and training budget as
+the proposed model, so only the video input differs.
 
-Possible variants:
+Variants:
 
-- No transition sequence
+- No transition sequence: ordered states only. This is the matched control for
+  every claim about transitions. B2 is not a matched control, because it also
+  removes the sequence encoder and the reranker.
+- Transitions only: `Δz` without states.
 - Mean-pooled transition vector
 - Final minus initial state only
+- Shuffled states: states in a random order, as an appearance-only reference
+  at equal capacity.
+
+Every sequence variant is also evaluated with its input reversed in time.
 
 ---
 
@@ -185,7 +208,20 @@ Possible variants:
 
 ### Main Success Criterion
 
-The transition-aware model should improve retrieval metrics over relevant baselines, with particular attention to hard-negative examples where videos share similar objects or appearance.
+The transition-aware model (states + transitions) should improve over the
+matched no-transition ablation (B4), with the main comparison on the
+action-contrast hard-negative subset. The improvement counts only if its
+paired-bootstrap 95% confidence interval excludes zero and it has the same sign
+for every training seed.
+
+If the two models do not differ, the conclusion is that V-JEPA 2 states already
+carry the change information. This is a valid answer to the research question
+and is reported as such.
+
+### Training Protocol
+
+All trained models use the same training budget with early stopping on
+development-validation MRR, and are run with three seeds.
 
 ---
 

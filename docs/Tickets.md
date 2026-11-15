@@ -428,7 +428,7 @@ Acceptance criteria:
 - Output order matches the original frame/state order.
 - No pooling is applied inside this function.
 
-### T2.2 - Implement Transition Sequence Encoder
+### T2.2 - Implement State and Transition Sequence Encoder
 
 Owner: Quynh
 
@@ -439,8 +439,9 @@ Files:
 
 Inputs:
 
-- Transition embeddings with shape `(T - 1, D)`.
-- Optional mask for padded transitions.
+- State embeddings with shape `(T, D)` and transition embeddings with shape
+  `(T - 1, D)`, combined into tokens `[z[t], Δz[t]]` with shape `(T - 1, 2D)`.
+- Optional mask for padded steps.
 
 Required function:
 
@@ -461,6 +462,11 @@ Acceptance criteria:
 - The encoder supports variable sequence length after frame sampling.
 - A mean-pooling fallback exists for early integration.
 - The output is deterministic in evaluation mode.
+- The encoder reads both states and transitions. A transition-only input
+  discards scene content and is kept only as an ablation (T3.3).
+- States and transitions are normalized separately before concatenation.
+  Their norms differ by about a factor of 6.5, so one LayerNorm over the
+  concatenation would let the states dominate.
 
 ### T2.3 - Implement Query-Conditioned Reranker
 
@@ -541,6 +547,12 @@ Acceptance criteria:
   decoding every epoch.
 - Validation uses the shared evaluator.
 - The best checkpoint is selected by validation Recall@1 or MRR.
+- Training stops when validation MRR has not improved for 5 epochs, up to a
+  limit of 50 epochs. A run that reaches the limit while still improving is
+  flagged in its log.
+- The seed is a parameter and is recorded in the checkpoint and log names.
+- The epoch limit, patience, learning rate, batch size, and selection metric
+  are defined once and shared with the ablation runners (T3.3).
 
 ### T2.5 - Implement Shared Retrieval Evaluator
 
@@ -609,7 +621,7 @@ def build_hard_negative_set(
     """Create a hard-negative JSONL file and return its path."""
 ```
 
-Recommended evaluator helper:
+Required evaluator helpers:
 
 ```python
 def compute_hard_negative_metrics(
@@ -618,6 +630,19 @@ def compute_hard_negative_metrics(
     k_values: tuple[int, ...] = (1, 5, 10),
 ) -> dict:
     """Evaluate per-query hard-negative candidate sets."""
+
+def compute_hard_negative_metrics_by_type(
+    hard_negative_rows: list[dict],
+    score_lookup: dict[tuple[str, str], float],
+) -> dict[str, dict]:
+    """Return pairwise accuracy and restricted Recall@1 for each negative type."""
+
+def build_action_contrast_set(
+    annotations: list[dict],
+    output_path: Path,
+    max_negatives: int = 9,
+) -> Path:
+    """Create candidate sets whose negatives are all opposite-action videos."""
 ```
 
 Hard-negative row schema:
@@ -643,6 +668,15 @@ Acceptance criteria:
 - The hard-negative set can be evaluated by the same metrics function.
 - Hard-negative evaluation does not assume that all queries share one global
   candidate list.
+- Metrics are reported per negative type as well as in aggregate.
+  `negative_types[i]` refers to the i-th non-target candidate.
+- Coverage is reported: the share of negatives of each type, and the number of
+  queries with at least one opposite-action negative.
+- The action-contrast set (`data/annotations/action_contrast.jsonl`) has no
+  filler negatives. Queries whose action has no opposite are excluded, and
+  candidate lists may be shorter than 10.
+- The list of label pairs treated as opposites is written out and checked by
+  hand.
 
 ### T2.7 - Implement V-JEPA Non-Transition Baseline
 
@@ -706,6 +740,10 @@ Acceptance criteria:
 - Results include Recall@1, Recall@5, Recall@10, MRR, and mAP.
 - The command/config used to generate the result is documented.
 - Result files include model name, checkpoint path, split name, and timestamp.
+- Results are produced for seeds 42, 43, and 44. Each result file records its
+  seed and best epoch.
+- Hard-negative results include the per-type metrics and the action-contrast
+  set (T2.6).
 
 ### T3.2 - Run Shared Evaluation and Comparison Tables
 
@@ -739,6 +777,14 @@ Acceptance criteria:
 - All models are evaluated on the same split and candidate set.
 - Table columns use consistent metric names.
 - Missing metrics are marked clearly instead of silently dropped.
+- Each row reports the mean and standard deviation across seeds.
+- The table has columns for each hard-negative type and for the
+  action-contrast set.
+- The main comparison (transition model minus `no_transition`, action-contrast
+  Recall@1) is reported with per-seed differences and a paired-bootstrap 95%
+  confidence interval, resampling queries paired by `query_id`.
+- The `no_transition` row appears in every main table, not only in the
+  ablation table.
 
 ### T3.3 - Run Ablation Experiments
 
@@ -779,10 +825,19 @@ def run_transition_ablation(
 
 Required variants:
 
-- `no_transition`
+- `no_transition`: ordered states only. The matched control for the main
+  model.
+- `transition_only`: `Δz` without states.
+- `shuffled_states`: `no_transition` with the state order permuted per video,
+  resampled every epoch in training and fixed per video in evaluation.
 - `mean_transition`
 - `final_minus_initial`
 - `full_transition_without_query_conditioning`
+
+Required evaluation option:
+
+- `--reverse-time`: evaluate any sequence variant with its input states
+  reversed before transitions are computed.
 
 Outputs:
 
@@ -793,6 +848,10 @@ Acceptance criteria:
 - Every ablation uses the same queries, candidate ids, and evaluator.
 - Each result file records the exact ablation variant name.
 - The implementation avoids duplicating evaluator logic.
+- Every trained variant uses the training protocol from T2.4, with seeds 42,
+  43, and 44.
+- Every variant except the reranker ablation uses the same sequence encoder
+  and reranker as the main model, so only the video input differs.
 
 ## Milestone 4 - Analysis and Final Report
 
@@ -896,6 +955,12 @@ Acceptance criteria:
 - The report separates full retrieval and hard-negative retrieval results.
 - Limitations include dataset scope, compute constraints, and simple transition
   operation assumptions.
+- Claims about transitions rest on the comparison with `no_transition`, not on
+  comparisons with B1 or B2 alone.
+- The conclusion follows the main success criterion in PRD Section 7, and a
+  null result is reported as one.
+- Limitations also note that V-JEPA 2 states are already temporally
+  contextualized, and that the 16 states are interpolated from 8 tubelets.
 
 ## Final Deliverables
 
