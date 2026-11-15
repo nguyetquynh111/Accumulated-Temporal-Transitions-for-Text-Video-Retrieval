@@ -13,6 +13,7 @@ R=outputs/results
 results=()
 for name in clip_baseline vjepa_baseline ablation_no_transition ablation_mean_transition \
     ablation_final_minus_initial ablation_full_transition_without_query_conditioning \
+    ablation_shuffled_full_transition ablation_shuffled_no_transition \
     transition_model; do
   # Trained models write one <name>_seed<seed>.json per seed; CLIP writes <name>.json.
   found=("$R/$name".json "$R/$name"_seed*.json)

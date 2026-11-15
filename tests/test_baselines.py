@@ -123,6 +123,29 @@ class VjepaBaselineTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             variant_sequence("unknown", states)
 
+    def test_shuffled_variants_permute_tokens_per_video(self):
+        states = np.arange(16 * 3, dtype=np.float32).reshape(16, 3)
+        full = variant_sequence("full_transition", states)
+        shuffled = variant_sequence("shuffled_full_transition", states, video_id="v1")
+        # Same [z, dz] tokens, in another order: dz is still taken between adjacent frames.
+        self.assertFalse(np.array_equal(shuffled, full))
+        np.testing.assert_array_equal(
+            np.sort(shuffled.view([("", np.float32)] * 6), axis=0),
+            np.sort(full.view([("", np.float32)] * 6), axis=0),
+        )
+        frames = variant_sequence("shuffled_no_transition", states, video_id="v1")
+        self.assertFalse(np.array_equal(frames, states))
+        np.testing.assert_array_equal(frames[np.argsort(frames[:, 0])], states)
+        # The order is fixed per video, and differs between videos.
+        np.testing.assert_array_equal(
+            frames, variant_sequence("shuffled_no_transition", states, video_id="v1")
+        )
+        self.assertFalse(
+            np.array_equal(frames, variant_sequence("shuffled_no_transition", states, video_id="v2"))
+        )
+        with self.assertRaisesRegex(ValueError, "video_id"):
+            variant_sequence("shuffled_no_transition", states)
+
     def test_untrained_scoring_keeps_candidate_order(self):
         states = {"a": np.array([[0, 0], [1, 0]]), "b": np.array([[0, 0], [0, 1]])}
         texts = np.array([[1, 0], [0, 1]], dtype=np.float32)

@@ -4,7 +4,7 @@
 # full_transition only evaluates the main checkpoint (for error-analysis rankings).
 #SBATCH --job-name=attvr-variant
 #SBATCH --partition=farsightQ
-#SBATCH --array=0-5
+#SBATCH --array=0-7
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=48G
@@ -19,6 +19,8 @@ VARIANTS=(
   final_minus_initial
   full_transition_without_query_conditioning
   full_transition
+  shuffled_full_transition
+  shuffled_no_transition
 )
 source scripts/env.sh
 variant="${VARIANTS[${SLURM_ARRAY_TASK_ID:-0}]}"

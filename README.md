@@ -255,7 +255,11 @@ hard-negative set, and the action-contrast set. `pooled` is the V-JEPA baseline
 without transitions (B2), and `all_ablations` runs `no_transition`,
 `mean_transition`, `final_minus_initial`, and
 `full_transition_without_query_conditioning` (B3, the main model's `[z, Δz]`
-input without the reranker):
+input without the reranker), plus two temporal-order ablations that keep the
+reranker but shuffle the token order with a fixed per-video permutation:
+`shuffled_full_transition` (the main model's `[z, Δz]` tokens, so each Δz is
+still taken between adjacent frames, but the order of transitions is lost) and
+`shuffled_no_transition` (shuffled frames `z`, so both order and Δz are lost):
 
 ```bash
 python -m src.models.baselines.vjepa_baseline --variant pooled all_ablations --seeds 42 43 44
