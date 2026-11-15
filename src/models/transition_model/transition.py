@@ -25,7 +25,11 @@ MAX_TRANSITIONS = 64
 # Video inputs the main pipeline can build from cached states:
 # "state_transition" -> tokens [z[t], dz[t]], shape (T - 1, 2D) (main model)
 # "transition"       -> tokens dz[t], shape (T - 1, D) (transition-only ablation)
-VIDEO_INPUTS = ("state_transition", "transition")
+# "state_only"       -> tokens [z[t], 0], shape (T, 2D): the states-only control (E1)
+#                       of the main experiment, same width and encoder as state_transition
+VIDEO_INPUTS = ("state_transition", "transition", "state_only")
+# Inputs whose tokens have two groups of width D (states, transitions or zeros).
+TWO_GROUP_VIDEO_INPUTS = ("state_transition", "state_only")
 DEFAULT_VIDEO_INPUT = "state_transition"
 TRANSITION_CACHE_KEYS = (
     "video_id",
@@ -161,6 +165,20 @@ def build_state_transition_tokens(state_embeddings: np.ndarray) -> np.ndarray:
     return np.concatenate((state_embeddings[:-1], transitions), axis=1).astype(np.float32)
 
 
+def build_state_only_tokens(state_embeddings: np.ndarray) -> np.ndarray:
+    """Return tokens [z[t], 0] with shape (T, 2D), dtype float32.
+
+    The states-only control of the main experiment: the [z, dz] token width with
+    the transition channel set to zero, so the encoder and parameter count match
+    the main model. It keeps all T states, which the [z, dz] tokens also carry
+    (z[T] = z[T - 1] + dz[T - 1]), so only the explicit transition differs.
+    """
+    states = np.asarray(state_embeddings, dtype=np.float32)
+    if states.ndim != 2 or states.shape[0] < 2:
+        raise ValueError("state_embeddings must have shape (T, D) with T >= 2")
+    return np.concatenate((states, np.zeros_like(states)), axis=1)
+
+
 def build_video_tokens(
     state_embeddings: np.ndarray,
     video_input: str = DEFAULT_VIDEO_INPUT,
@@ -170,6 +188,8 @@ def build_video_tokens(
         return build_state_transition_tokens(state_embeddings)
     if video_input == "transition":
         return compute_transitions(state_embeddings)
+    if video_input == "state_only":
+        return build_state_only_tokens(state_embeddings)
     raise ValueError(f"video_input must be one of {VIDEO_INPUTS}, got {video_input!r}")
 
 

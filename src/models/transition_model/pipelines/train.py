@@ -410,7 +410,8 @@ def main() -> None:
         "--video-input",
         choices=VIDEO_INPUTS,
         default=DEFAULT_VIDEO_INPUT,
-        help="state_transition: [z, dz] tokens (main model); transition: dz only (ablation)",
+        help="state_transition: [z, dz] tokens (main model); transition: dz only (ablation); "
+        "state_only: [z, 0] tokens (states-only control of the main experiment)",
     )
     parser.add_argument("--batch-size", type=int, default=BATCH_SIZE)
     parser.add_argument("--learning-rate", type=float, default=LEARNING_RATE)

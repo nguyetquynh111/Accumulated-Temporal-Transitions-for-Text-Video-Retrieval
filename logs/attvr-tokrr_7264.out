@@ -1,0 +1,29 @@
+job=7264 task=none host=farsight gpus=2
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T12:49:18-06:00
+[two_stage_token_reranker_state_only] encoding 168913 train rows with the frozen encoder
+[two_stage_token_reranker_state_only] Epoch 1: loss=0.1788 val R@1=0.1058 MRR=0.1955
+[two_stage_token_reranker_state_only] Epoch 2: loss=0.1698 val R@1=0.1083 MRR=0.1973
+[two_stage_token_reranker_state_only] Epoch 3: loss=0.1619 val R@1=0.1076 MRR=0.1982
+[two_stage_token_reranker_state_only] Epoch 4: loss=0.1587 val R@1=0.1081 MRR=0.1987
+[two_stage_token_reranker_state_only] Epoch 5: loss=0.1536 val R@1=0.1071 MRR=0.1983
+[two_stage_token_reranker_state_only] Epoch 6: loss=0.1510 val R@1=0.1100 MRR=0.2003
+[two_stage_token_reranker_state_only] Epoch 7: loss=0.1502 val R@1=0.1078 MRR=0.1994
+[two_stage_token_reranker_state_only] Epoch 8: loss=0.1483 val R@1=0.1108 MRR=0.2005
+[two_stage_token_reranker_state_only] Epoch 9: loss=0.1465 val R@1=0.1092 MRR=0.1997
+[two_stage_token_reranker_state_only] Epoch 10: loss=0.1441 val R@1=0.1090 MRR=0.2003
+[two_stage_token_reranker_state_only] Epoch 11: loss=0.1444 val R@1=0.1092 MRR=0.1997
+[two_stage_token_reranker_state_only] Epoch 12: loss=0.1405 val R@1=0.1082 MRR=0.1988
+[two_stage_token_reranker_state_only] Epoch 13: loss=0.1399 val R@1=0.1094 MRR=0.1995
+[two_stage_token_reranker_state_only] best epoch 8 of 13
+{
+  "two_stage_token_reranker_state_only_seed44": {
+    "recall@1": 0.1071918637501009,
+    "recall@5": 0.28113649204939867,
+    "recall@10": 0.38631043667769793,
+    "mrr": 0.19751349091529846,
+    "map": 0.19751349091529846,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_state_only_seed44.json

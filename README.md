@@ -3,6 +3,18 @@
 This project explores text-to-video retrieval on Something-Something V2 using
 ordered video frames and their temporal transitions.
 
+**Research question.** Can accumulated latent transitions between consecutive
+video states improve text-video retrieval compared with static video
+representations?
+
+**Final method.** V-JEPA 2 states `z[1:T]` → transitions `Δz[t] = z[t+1] - z[t]`
+→ temporal self-attention over tokens `[z[t], Δz[t]]` → query-conditioned
+token-level cross-attention matching → ranking. It is trained in two stages:
+the temporal encoder with the cosine objective, then, with the encoder frozen,
+the token-level matcher. The main experiment compares this model (E2) with an
+identical model whose tokens carry no `Δz` (E1, `[z[t], 0]`); see
+[Main experiment](#main-experiment-e1-vs-e2).
+
 ## Install
 
 Run from the repository root with Conda installed:
@@ -119,7 +131,7 @@ The generated annotations reference video files under `data/videos/` by default.
 ### 4. Build the hard-negative and action-contrast sets
 
 ```bash
-python -m src.eval.build_candidate_sets
+python -m src.data.build_candidate_sets
 ```
 
 This reads `test.jsonl` and writes to `data/annotations/`:
@@ -169,7 +181,11 @@ python -m src.models.transition_model.pipelines.extract_features \
   --encoder mock --limit 2 --output-dir outputs/features/mock
 ```
 
-## Train the transition model
+## Train the single-stage transition model
+
+This is the single-stage model (states + `Δz`, pooled query-conditioned
+reranker). The final method is trained in two stages; see
+[Main experiment](#main-experiment-e1-vs-e2).
 
 ```bash
 for seed in 42 43 44; do
@@ -204,7 +220,7 @@ Useful options (run with `--help` for all of them):
 - `--text-model-name` swaps in another mean-pooled Hugging Face text encoder.
 - `--limit 200` runs on a small subset.
 
-On Slurm, `RUN_NAME=transition_model sbatch scripts/train_eval.sbatch` trains and
+On Slurm, `RUN_NAME=transition_model sbatch scripts/train_eval_single_stage.sbatch` trains and
 evaluates all three seeds as an array job (see [Run on Slurm](#run-on-slurm)).
 
 ## Evaluate
@@ -233,6 +249,39 @@ model and text-encoder settings, split, command, and timestamp. Use
 `--checkpoint PATH --output PATH` to evaluate a single checkpoint instead, and
 `--transition-dir outputs/features/transitions` to also save per-video
 transition caches.
+
+## Main experiment (E1 vs E2)
+
+Both models use the same temporal encoder, token-level matcher, two-stage
+training, protocol, seeds, and evaluation; only the `Δz` half of each token
+differs. E1's tokens `[z[t], 0]` (`t = 1..T`) have the same width as E2's
+`[z[t], Δz[t]]` (`t = 1..T-1`), so both models have the same number of
+parameters, and E1 sees every state E2 can recover.
+
+Stage 1 trains the encoder with the cosine objective only (no reranker); stage 2
+freezes it and trains the token-level matcher. E2's stage 1 is the
+`ablation_full_transition_without_query_conditioning` checkpoint. E1:
+
+```bash
+for seed in 42 43 44; do
+  python -m src.models.transition_model.pipelines.train --seed "$seed" \
+    --run-name ablation_state_only_without_query_conditioning \
+    --video-input state_only --no-query-conditioning
+done
+python -m src.models.transition_model.pipelines.train_token_reranker --encoder state_only --seeds 42 43 44
+```
+
+Stage 2 loads `outputs/checkpoints/<stage-1 run>_seed<seed>_best.pt`, freezes
+it, and writes `two_stage_token_reranker[_state_only]_seed<seed>.json`, plus
+`per_query_<run>_seed<seed>.jsonl` (each test query's `query_id` and target rank
+in the full, hard-negative, and action-contrast settings, for paired
+comparisons) and `rankings_<run>_seed<seed>.jsonl`. `--eval-only` re-evaluates
+trained checkpoints without retraining (an existing result file is kept and only
+checked against the new metrics); `--reverse-time` evaluates them with each
+video's states reversed in time (`<run>_seed<seed>_reversed.json`).
+
+On Slurm, `bash scripts/submit_main_experiment.sh` submits E1 (both stages),
+E2 evaluation, and reverse-time evaluation of both.
 
 ## Baselines, ablations, and error analysis
 
@@ -285,14 +334,16 @@ sources `scripts/env.sh`, which activates the `attvr` Conda env (override with
 
 | Script | What it runs |
 |---|---|
-| `bash scripts/submit_pipeline.sh [--skip-extract]` | V-JEPA extraction, then train + evaluate for seeds 42, 43, 44 |
+| `bash scripts/submit_single_stage.sh [--skip-extract]` | V-JEPA extraction, then train + evaluate for seeds 42, 43, 44 |
 | `bash scripts/submit_baselines.sh` | CLIP, every V-JEPA variant, then the comparison table |
-| `sbatch scripts/extract_features.sbatch` | Sharded V-JEPA extraction (array job) |
-| `sbatch scripts/train_eval.sbatch` | Train and evaluate one seed per array task |
-| `sbatch scripts/train.sbatch` / `scripts/evaluate.sbatch` | Train or evaluate only; extra arguments are passed through |
-| `sbatch scripts/clip_baseline.sbatch` | CLIP baseline (B1) |
-| `sbatch scripts/vjepa_variants.sbatch` | Array: `pooled` (B2) and the ablations; `--array=0` runs B2 only |
-| `sbatch scripts/compare.sbatch` | Comparison table and error-analysis figures |
+| `sbatch scripts/extract_vjepa_features.sbatch` | Sharded V-JEPA extraction (array job) |
+| `sbatch scripts/train_eval_single_stage.sbatch` | Train and evaluate one seed per array task |
+| `sbatch scripts/train_single_stage.sbatch` / `scripts/eval_single_stage.sbatch` | Train or evaluate only; extra arguments are passed through |
+| `sbatch scripts/eval_clip_baseline.sbatch` | CLIP baseline (B1) |
+| `bash scripts/submit_main_experiment.sh` | E1 stage 1 and 2 (3 seeds), E2 evaluation, reverse-time for E1 and E2 |
+| `sbatch scripts/train_token_matcher.sbatch` | Stage 2 token-level matcher; extra arguments are passed through |
+| `sbatch scripts/train_vjepa_variants.sbatch` | Array: `pooled` (B2) and the ablations; `--array=0` runs B2 only |
+| `sbatch scripts/build_tables.sbatch` | Comparison table and error-analysis figures |
 | `sbatch scripts/pack_artifacts.sbatch` | `artifacts/attvr_artifacts.zip` for the [shared Drive folder](#shared-artifacts-google-drive) |
 
 Run tests with `python -m pytest`. See [Tickets](docs/Tickets.md) for interfaces,

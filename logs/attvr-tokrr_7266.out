@@ -1,0 +1,41 @@
+job=7266 task=none host=farsight gpus=3
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T12:28:35-06:00
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed42.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "two_stage_token_reranker_seed42": {
+    "recall@1": 0.11050125110985552,
+    "recall@5": 0.28186294293324726,
+    "recall@10": 0.3869561707966745,
+    "mrr": 0.2013017237186432,
+    "map": 0.2013017237186432,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed42.json
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed43.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "two_stage_token_reranker_seed43": {
+    "recall@1": 0.10880619904754217,
+    "recall@5": 0.279037856162725,
+    "recall@10": 0.38655258697231415,
+    "mrr": 0.19984324276447296,
+    "map": 0.19984324276447296,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed43.json
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed44.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "two_stage_token_reranker_seed44": {
+    "recall@1": 0.10727258051497296,
+    "recall@5": 0.27758495439502784,
+    "recall@10": 0.38251674872871094,
+    "mrr": 0.19722628593444824,
+    "map": 0.19722628593444824,
+    "num_queries": 12389,
+    "num_candidates": 12389
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/two_stage_token_reranker_seed44.json

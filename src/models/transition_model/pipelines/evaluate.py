@@ -28,11 +28,8 @@ from config import (
     TRAIN_SEEDS,
     VJEPA_FEATURE_ROOT,
 )
-from src.eval.evaluate import (
-    compute_retrieval_metrics,
-    save_metrics,
-    summarize_candidate_set,
-)
+from src.eval.candidate_metrics import summarize_candidate_set
+from src.eval.evaluate import compute_retrieval_metrics, save_metrics
 from src.models.transition_model.retrieval import (
     ENCODE_BATCH_SIZE,
     TransitionRetrievalModel,

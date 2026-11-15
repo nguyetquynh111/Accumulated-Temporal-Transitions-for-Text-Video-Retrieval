@@ -1,0 +1,67 @@
+job=7195 task=3 host=farsight gpus=3
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-14T19:55:18-06:00
+variant=final_minus_initial
+[ablation_final_minus_initial] train rows: 168913 (skipped 0 without features)
+[ablation_final_minus_initial] val rows: 12388 (skipped 0 without features)
+[ablation_final_minus_initial] Epoch 1: loss=2.7520 val R@1=0.0266 MRR=0.0675
+[ablation_final_minus_initial] Epoch 2: loss=1.8662 val R@1=0.0387 MRR=0.0869
+[ablation_final_minus_initial] Epoch 3: loss=1.5814 val R@1=0.0420 MRR=0.0941
+[ablation_final_minus_initial] Epoch 4: loss=1.4039 val R@1=0.0457 MRR=0.1018
+[ablation_final_minus_initial] Epoch 5: loss=1.2723 val R@1=0.0519 MRR=0.1078
+[ablation_final_minus_initial] Epoch 6: loss=1.1697 val R@1=0.0500 MRR=0.1104
+[ablation_final_minus_initial] Epoch 7: loss=1.0813 val R@1=0.0521 MRR=0.1125
+[ablation_final_minus_initial] Epoch 8: loss=1.0107 val R@1=0.0555 MRR=0.1184
+[ablation_final_minus_initial] Epoch 9: loss=0.9441 val R@1=0.0572 MRR=0.1198
+[ablation_final_minus_initial] Epoch 10: loss=0.8862 val R@1=0.0555 MRR=0.1194
+[ablation_final_minus_initial] Epoch 11: loss=0.8312 val R@1=0.0565 MRR=0.1201
+[ablation_final_minus_initial] Epoch 12: loss=0.7844 val R@1=0.0604 MRR=0.1243
+[ablation_final_minus_initial] Epoch 13: loss=0.7403 val R@1=0.0602 MRR=0.1244
+[ablation_final_minus_initial] Epoch 14: loss=0.6993 val R@1=0.0612 MRR=0.1250
+[ablation_final_minus_initial] Epoch 15: loss=0.6637 val R@1=0.0579 MRR=0.1227
+[ablation_final_minus_initial] Epoch 16: loss=0.6295 val R@1=0.0608 MRR=0.1255
+[ablation_final_minus_initial] Epoch 17: loss=0.5984 val R@1=0.0605 MRR=0.1254
+[ablation_final_minus_initial] Epoch 18: loss=0.5695 val R@1=0.0579 MRR=0.1238
+[ablation_final_minus_initial] Epoch 19: loss=0.5457 val R@1=0.0604 MRR=0.1247
+[ablation_final_minus_initial] Epoch 20: loss=0.5204 val R@1=0.0605 MRR=0.1251
+[ablation_final_minus_initial] Epoch 21: loss=0.4972 val R@1=0.0603 MRR=0.1262
+[ablation_final_minus_initial] Epoch 22: loss=0.4746 val R@1=0.0597 MRR=0.1247
+[ablation_final_minus_initial] Epoch 23: loss=0.4552 val R@1=0.0646 MRR=0.1286
+[ablation_final_minus_initial] Epoch 24: loss=0.4363 val R@1=0.0609 MRR=0.1253
+[ablation_final_minus_initial] Epoch 25: loss=0.4173 val R@1=0.0583 MRR=0.1237
+[ablation_final_minus_initial] Epoch 26: loss=0.4043 val R@1=0.0604 MRR=0.1250
+[ablation_final_minus_initial] Epoch 27: loss=0.3893 val R@1=0.0619 MRR=0.1258
+[ablation_final_minus_initial] Epoch 28: loss=0.3803 val R@1=0.0617 MRR=0.1266
+[ablation_final_minus_initial] Early stop at epoch 28: no gain for 5 epochs
+[ablation_final_minus_initial] Best epoch 23 of 28
+{
+  "ablation_final_minus_initial_seed42": {
+    "full": {
+      "recall@1": 0.05738961982403745,
+      "recall@5": 0.17572039712648316,
+      "recall@10": 0.2516748728710953,
+      "mrr": 0.12270893156528473,
+      "map": 0.12270893156528473,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.6710791831463395,
+      "recall@5": 0.9564936637339575,
+      "recall@10": 1.0,
+      "mrr": 0.789415717124939,
+      "map": 0.789415717124939,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6894278934880043,
+      "recall@5": 0.9354073292907988,
+      "recall@10": 1.0,
+      "mrr": 0.7949201464653015,
+      "map": 0.7949201464653015,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_final_minus_initial_seed42.json

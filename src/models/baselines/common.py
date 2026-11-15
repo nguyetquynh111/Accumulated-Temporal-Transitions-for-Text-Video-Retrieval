@@ -9,7 +9,8 @@ from typing import Callable
 import numpy as np
 
 from config import PROJECT_ROOT
-from src.eval.evaluate import compute_retrieval_metrics, summarize_candidate_set
+from src.eval.candidate_metrics import summarize_candidate_set
+from src.eval.evaluate import compute_retrieval_metrics
 
 
 # Config
@@ -110,9 +111,6 @@ def evaluate_hard_negatives(
     score_fn: Callable[[np.ndarray, np.ndarray], np.ndarray],
 ) -> dict:
     """Score each hard-negative row against only its own candidates.
-
-    Returns aggregate metrics plus per-negative-type metrics and coverage when
-    the rows carry negative_types.
 
     score_fn maps text embeddings (1, D_text) and candidate embeddings (n, D)
     to scores (1, n), so every model can reuse this with its own scorer.

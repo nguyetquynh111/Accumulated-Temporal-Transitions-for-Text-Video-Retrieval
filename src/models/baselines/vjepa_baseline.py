@@ -1,29 +1,21 @@
 """B2 baseline (pooled V-JEPA, no transitions) and the transition ablations (T2.7, T3.3).
 
 Every variant feeds a different view of the same cached V-JEPA states into the
-shared TransitionRetrievalModel, trains it with the main training protocol
-(fit_retrieval_model: same loss, epoch limit, early stopping, and selection
-metric), and is scored with the shared evaluator. Only the video input, and for
+shared TransitionRetrievalModel, trains it with the main training protocol, and
+is scored with the shared evaluator. Only the video input, and for
 two variants the query-conditioned reranker, changes between runs:
 
 - pooled: mean state as one token, no reranker (B2).
 - full_transition: [z[t], z[t + 1] - z[t]] tokens with the reranker. This is the
-  main model; it is trained by pipelines.train, and here only its checkpoint
-  is evaluated, to get rankings in the same format as the other variants. Its
-  metrics go to full_transition_seed<seed>.json; the main result file
-  transition_model_seed<seed>.json is written by pipelines.evaluate.
+  main model; evaluate its checkpoint with it to get comparable rankings.
 - no_transition: the raw state sequence z[1:T] instead of transitions.
 - mean_transition: the mean transition vector as one token.
 - final_minus_initial: z[T] - z[1] as one token.
-- full_transition_without_query_conditioning: the main model's [z, dz] tokens,
-  no reranker (B3).
+- full_transition_without_query_conditioning: [z, dz] tokens, no reranker (B3).
 
 Note that the mean of z[t + 1] - z[t] telescopes to (z[T] - z[1]) / (T - 1), and
 the model's input LayerNorm removes that scale, so mean_transition and
 final_minus_initial see the same input up to a constant factor.
-
-Checkpoints, logs, results, and rankings are named <result_name>_seed<seed>,
-like the main model's.
 """
 
 import argparse
@@ -100,7 +92,6 @@ VARIANTS = {
     "final_minus_initial": True,
     "full_transition_without_query_conditioning": False,
 }
-# Variants that read the main model's [z, dz] tokens; the others are single-stream.
 STATE_TRANSITION_VARIANTS = ("full_transition", "full_transition_without_query_conditioning")
 ABLATION_VARIANTS = (
     "no_transition",
@@ -300,11 +291,7 @@ def train_variant_model(
     limit: int | None = None,
     seed: int = RANDOM_SEED,
 ) -> Path:
-    """Train one baseline/ablation variant with the main training protocol.
-
-    Returns `<checkpoint_dir>/<result_name>_seed<seed>_best.pt`; the per-epoch log
-    goes to `<log_dir>/<result_name>_seed<seed>_train_log.jsonl`.
-    """
+    """Train one baseline/ablation variant and return its best checkpoint path."""
     if variant == "full_transition":
         raise ValueError(
             "train the main model with src.models.transition_model.pipelines.train"
@@ -588,8 +575,6 @@ def main() -> None:
                     seed=seed,
                 )
             stem = f"{result_name(variant)}_seed{seed}"
-            # pipelines.evaluate owns <main run>_seed<seed>.json, so the main model's
-            # result from this runner goes to its own file.
             output_stem = f"full_transition_seed{seed}" if variant == "full_transition" else stem
             output = args.result_dir / f"{output_stem}.json"
             result = evaluate_variant(

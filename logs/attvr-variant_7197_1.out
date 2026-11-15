@@ -1,0 +1,65 @@
+job=7200 task=1 host=farsight gpus=1
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T05:19:03-06:00
+variant=no_transition
+[ablation_no_transition] train rows: 168913 (skipped 0 without features)
+[ablation_no_transition] val rows: 12388 (skipped 0 without features)
+[ablation_no_transition] Epoch 1: loss=2.0750 val R@1=0.0530 MRR=0.1086
+[ablation_no_transition] Epoch 2: loss=1.2187 val R@1=0.0649 MRR=0.1307
+[ablation_no_transition] Epoch 3: loss=0.9675 val R@1=0.0733 MRR=0.1467
+[ablation_no_transition] Epoch 4: loss=0.8129 val R@1=0.0814 MRR=0.1552
+[ablation_no_transition] Epoch 5: loss=0.7119 val R@1=0.0845 MRR=0.1615
+[ablation_no_transition] Epoch 6: loss=0.6309 val R@1=0.0880 MRR=0.1667
+[ablation_no_transition] Epoch 7: loss=0.5618 val R@1=0.0886 MRR=0.1691
+[ablation_no_transition] Epoch 8: loss=0.5104 val R@1=0.0924 MRR=0.1760
+[ablation_no_transition] Epoch 9: loss=0.4662 val R@1=0.0952 MRR=0.1783
+[ablation_no_transition] Epoch 10: loss=0.4241 val R@1=0.0938 MRR=0.1781
+[ablation_no_transition] Epoch 11: loss=0.3921 val R@1=0.0980 MRR=0.1820
+[ablation_no_transition] Epoch 12: loss=0.3605 val R@1=0.0961 MRR=0.1799
+[ablation_no_transition] Epoch 13: loss=0.3331 val R@1=0.0960 MRR=0.1826
+[ablation_no_transition] Epoch 14: loss=0.3097 val R@1=0.0966 MRR=0.1822
+[ablation_no_transition] Epoch 15: loss=0.2897 val R@1=0.0933 MRR=0.1794
+[ablation_no_transition] Epoch 16: loss=0.2706 val R@1=0.0948 MRR=0.1800
+[ablation_no_transition] Epoch 17: loss=0.2535 val R@1=0.0990 MRR=0.1859
+[ablation_no_transition] Epoch 18: loss=0.2388 val R@1=0.1002 MRR=0.1860
+[ablation_no_transition] Epoch 19: loss=0.2245 val R@1=0.0980 MRR=0.1839
+[ablation_no_transition] Epoch 20: loss=0.2156 val R@1=0.0978 MRR=0.1846
+[ablation_no_transition] Epoch 21: loss=0.2032 val R@1=0.1011 MRR=0.1872
+[ablation_no_transition] Epoch 22: loss=0.1941 val R@1=0.0969 MRR=0.1830
+[ablation_no_transition] Epoch 23: loss=0.1860 val R@1=0.0953 MRR=0.1831
+[ablation_no_transition] Epoch 24: loss=0.1787 val R@1=0.0984 MRR=0.1851
+[ablation_no_transition] Epoch 25: loss=0.1706 val R@1=0.0996 MRR=0.1838
+[ablation_no_transition] Epoch 26: loss=0.1632 val R@1=0.0986 MRR=0.1867
+[ablation_no_transition] Early stop at epoch 26: no gain for 5 epochs
+[ablation_no_transition] Best epoch 21 of 26
+{
+  "ablation_no_transition_seed43": {
+    "full": {
+      "recall@1": 0.09847445314391799,
+      "recall@5": 0.26265235289369604,
+      "recall@10": 0.3607232222132537,
+      "mrr": 0.18505406379699707,
+      "map": 0.18505406379699707,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7566389539107272,
+      "recall@5": 0.9759464040681249,
+      "recall@10": 1.0,
+      "mrr": 0.8510489463806152,
+      "map": 0.8510489463806152,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.708673872923807,
+      "recall@5": 0.9520168731874505,
+      "recall@10": 1.0,
+      "mrr": 0.8116179704666138,
+      "map": 0.8116179704666138,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_no_transition_seed43.json

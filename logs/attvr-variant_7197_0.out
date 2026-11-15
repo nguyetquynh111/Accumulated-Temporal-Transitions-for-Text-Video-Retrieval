@@ -1,0 +1,64 @@
+job=7199 task=0 host=farsight gpus=0
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-15T05:19:03-06:00
+variant=pooled
+[vjepa_baseline] train rows: 168913 (skipped 0 without features)
+[vjepa_baseline] val rows: 12388 (skipped 0 without features)
+[vjepa_baseline] Epoch 1: loss=2.2634 val R@1=0.0490 MRR=0.1029
+[vjepa_baseline] Epoch 2: loss=1.4076 val R@1=0.0624 MRR=0.1270
+[vjepa_baseline] Epoch 3: loss=1.1349 val R@1=0.0708 MRR=0.1399
+[vjepa_baseline] Epoch 4: loss=0.9648 val R@1=0.0770 MRR=0.1490
+[vjepa_baseline] Epoch 5: loss=0.8495 val R@1=0.0805 MRR=0.1548
+[vjepa_baseline] Epoch 6: loss=0.7601 val R@1=0.0817 MRR=0.1577
+[vjepa_baseline] Epoch 7: loss=0.6848 val R@1=0.0854 MRR=0.1625
+[vjepa_baseline] Epoch 8: loss=0.6265 val R@1=0.0853 MRR=0.1646
+[vjepa_baseline] Epoch 9: loss=0.5788 val R@1=0.0870 MRR=0.1666
+[vjepa_baseline] Epoch 10: loss=0.5320 val R@1=0.0888 MRR=0.1692
+[vjepa_baseline] Epoch 11: loss=0.4972 val R@1=0.0906 MRR=0.1698
+[vjepa_baseline] Epoch 12: loss=0.4639 val R@1=0.0869 MRR=0.1677
+[vjepa_baseline] Epoch 13: loss=0.4330 val R@1=0.0876 MRR=0.1688
+[vjepa_baseline] Epoch 14: loss=0.4088 val R@1=0.0896 MRR=0.1702
+[vjepa_baseline] Epoch 15: loss=0.3859 val R@1=0.0905 MRR=0.1703
+[vjepa_baseline] Epoch 16: loss=0.3634 val R@1=0.0907 MRR=0.1707
+[vjepa_baseline] Epoch 17: loss=0.3435 val R@1=0.0920 MRR=0.1744
+[vjepa_baseline] Epoch 18: loss=0.3265 val R@1=0.0907 MRR=0.1742
+[vjepa_baseline] Epoch 19: loss=0.3096 val R@1=0.0906 MRR=0.1730
+[vjepa_baseline] Epoch 20: loss=0.2989 val R@1=0.0939 MRR=0.1759
+[vjepa_baseline] Epoch 21: loss=0.2843 val R@1=0.0937 MRR=0.1744
+[vjepa_baseline] Epoch 22: loss=0.2740 val R@1=0.0922 MRR=0.1734
+[vjepa_baseline] Epoch 23: loss=0.2612 val R@1=0.0907 MRR=0.1730
+[vjepa_baseline] Epoch 24: loss=0.2519 val R@1=0.0911 MRR=0.1724
+[vjepa_baseline] Epoch 25: loss=0.2439 val R@1=0.0907 MRR=0.1717
+[vjepa_baseline] Early stop at epoch 25: no gain for 5 epochs
+[vjepa_baseline] Best epoch 20 of 25
+{
+  "vjepa_baseline_seed43": {
+    "full": {
+      "recall@1": 0.08983775930260715,
+      "recall@5": 0.24626684962466705,
+      "recall@10": 0.34135119864395835,
+      "mrr": 0.1726548969745636,
+      "map": 0.1726548969745636,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7036080393897812,
+      "recall@5": 0.9649689240455243,
+      "recall@10": 1.0,
+      "mrr": 0.8146557807922363,
+      "map": 0.8146557807922363,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.610071183759557,
+      "recall@5": 0.9219615080411284,
+      "recall@10": 1.0,
+      "mrr": 0.7400631904602051,
+      "map": 0.7400631904602051,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/vjepa_baseline_seed43.json

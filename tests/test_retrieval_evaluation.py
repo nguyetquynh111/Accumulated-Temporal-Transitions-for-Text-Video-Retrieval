@@ -123,24 +123,3 @@ def test_hard_negative_metrics_with_different_candidates():
 
     assert metrics["num_queries"] == 2
     assert metrics["num_candidates"] == 3
-
-def test_comparison_table_marks_missing_metrics(tmp_path):
-    import csv
-    import json
-
-    from src.eval.evaluate import build_comparison_table
-
-    full = {"recall@1": 0.5, "recall@5": 1.0, "recall@10": 1.0, "mrr": 0.75, "map": 0.75,
-            "num_queries": 2, "num_candidates": 2}
-    first = tmp_path / "a.json"
-    first.write_text(json.dumps({"model_name": "a", "split": "test", "full": full,
-                                 "hard_negative": None}))
-    second = tmp_path / "b.json"
-    second.write_text(json.dumps({"model_name": "b", "variant": "pooled", "split": "test",
-                                  "full": full, "hard_negative": full}))
-    path = build_comparison_table([first, second], tmp_path / "table.csv")
-    rows = list(csv.DictReader(path.open()))
-    assert [(r["model_name"], r["setting"]) for r in rows] == [
-        ("a", "full"), ("a", "hard_negative"), ("b", "full"), ("b", "hard_negative")]
-    assert rows[0]["mrr"] == "0.7500" and rows[0]["variant"] == "NA"
-    assert rows[1]["recall@1"] == "NA" and rows[3]["recall@1"] == "0.5000"

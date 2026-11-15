@@ -1,0 +1,79 @@
+job=7196 task=4 host=farsight gpus=4
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-14T19:55:18-06:00
+variant=full_transition_without_query_conditioning
+[ablation_full_transition_without_query_conditioning] train rows: 168913 (skipped 0 without features)
+[ablation_full_transition_without_query_conditioning] val rows: 12388 (skipped 0 without features)
+[ablation_full_transition_without_query_conditioning] Epoch 1: loss=1.9571 val R@1=0.0590 MRR=0.1214
+[ablation_full_transition_without_query_conditioning] Epoch 2: loss=1.1570 val R@1=0.0708 MRR=0.1433
+[ablation_full_transition_without_query_conditioning] Epoch 3: loss=0.9031 val R@1=0.0764 MRR=0.1550
+[ablation_full_transition_without_query_conditioning] Epoch 4: loss=0.7451 val R@1=0.0870 MRR=0.1675
+[ablation_full_transition_without_query_conditioning] Epoch 5: loss=0.6363 val R@1=0.0916 MRR=0.1751
+[ablation_full_transition_without_query_conditioning] Epoch 6: loss=0.5512 val R@1=0.0895 MRR=0.1755
+[ablation_full_transition_without_query_conditioning] Epoch 7: loss=0.4834 val R@1=0.0957 MRR=0.1817
+[ablation_full_transition_without_query_conditioning] Epoch 8: loss=0.4299 val R@1=0.0965 MRR=0.1832
+[ablation_full_transition_without_query_conditioning] Epoch 9: loss=0.3848 val R@1=0.0988 MRR=0.1838
+[ablation_full_transition_without_query_conditioning] Epoch 10: loss=0.3443 val R@1=0.0942 MRR=0.1824
+[ablation_full_transition_without_query_conditioning] Epoch 11: loss=0.3126 val R@1=0.0968 MRR=0.1847
+[ablation_full_transition_without_query_conditioning] Epoch 12: loss=0.2835 val R@1=0.0993 MRR=0.1874
+[ablation_full_transition_without_query_conditioning] Epoch 13: loss=0.2608 val R@1=0.0999 MRR=0.1875
+[ablation_full_transition_without_query_conditioning] Epoch 14: loss=0.2429 val R@1=0.1005 MRR=0.1856
+[ablation_full_transition_without_query_conditioning] Epoch 15: loss=0.2268 val R@1=0.0988 MRR=0.1863
+[ablation_full_transition_without_query_conditioning] Epoch 16: loss=0.2126 val R@1=0.1011 MRR=0.1886
+[ablation_full_transition_without_query_conditioning] Epoch 17: loss=0.1979 val R@1=0.0999 MRR=0.1877
+[ablation_full_transition_without_query_conditioning] Epoch 18: loss=0.1882 val R@1=0.0987 MRR=0.1877
+[ablation_full_transition_without_query_conditioning] Epoch 19: loss=0.1785 val R@1=0.1014 MRR=0.1908
+[ablation_full_transition_without_query_conditioning] Epoch 20: loss=0.1683 val R@1=0.0961 MRR=0.1855
+[ablation_full_transition_without_query_conditioning] Epoch 21: loss=0.1643 val R@1=0.0986 MRR=0.1873
+[ablation_full_transition_without_query_conditioning] Epoch 22: loss=0.1537 val R@1=0.0961 MRR=0.1848
+[ablation_full_transition_without_query_conditioning] Epoch 23: loss=0.1491 val R@1=0.1033 MRR=0.1913
+[ablation_full_transition_without_query_conditioning] Epoch 24: loss=0.1426 val R@1=0.0997 MRR=0.1867
+[ablation_full_transition_without_query_conditioning] Epoch 25: loss=0.1376 val R@1=0.1038 MRR=0.1925
+[ablation_full_transition_without_query_conditioning] Epoch 26: loss=0.1333 val R@1=0.1027 MRR=0.1898
+[ablation_full_transition_without_query_conditioning] Epoch 27: loss=0.1290 val R@1=0.0997 MRR=0.1882
+[ablation_full_transition_without_query_conditioning] Epoch 28: loss=0.1225 val R@1=0.1057 MRR=0.1937
+[ablation_full_transition_without_query_conditioning] Epoch 29: loss=0.1193 val R@1=0.1020 MRR=0.1913
+[ablation_full_transition_without_query_conditioning] Epoch 30: loss=0.1166 val R@1=0.1024 MRR=0.1914
+[ablation_full_transition_without_query_conditioning] Epoch 31: loss=0.1127 val R@1=0.1030 MRR=0.1925
+[ablation_full_transition_without_query_conditioning] Epoch 32: loss=0.1083 val R@1=0.1033 MRR=0.1898
+[ablation_full_transition_without_query_conditioning] Epoch 33: loss=0.1077 val R@1=0.1049 MRR=0.1942
+[ablation_full_transition_without_query_conditioning] Epoch 34: loss=0.1049 val R@1=0.1053 MRR=0.1948
+[ablation_full_transition_without_query_conditioning] Epoch 35: loss=0.1028 val R@1=0.1063 MRR=0.1959
+[ablation_full_transition_without_query_conditioning] Epoch 36: loss=0.0998 val R@1=0.1031 MRR=0.1905
+[ablation_full_transition_without_query_conditioning] Epoch 37: loss=0.0962 val R@1=0.1027 MRR=0.1914
+[ablation_full_transition_without_query_conditioning] Epoch 38: loss=0.0951 val R@1=0.1078 MRR=0.1950
+[ablation_full_transition_without_query_conditioning] Epoch 39: loss=0.0912 val R@1=0.1062 MRR=0.1946
+[ablation_full_transition_without_query_conditioning] Epoch 40: loss=0.0906 val R@1=0.1016 MRR=0.1912
+[ablation_full_transition_without_query_conditioning] Early stop at epoch 40: no gain for 5 epochs
+[ablation_full_transition_without_query_conditioning] Best epoch 35 of 40
+{
+  "ablation_full_transition_without_query_conditioning_seed42": {
+    "full": {
+      "recall@1": 0.10646541286625232,
+      "recall@5": 0.2695132779078215,
+      "recall@10": 0.3745257890063766,
+      "mrr": 0.19405114650726318,
+      "map": 0.19405114650726318,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7717329889418032,
+      "recall@5": 0.9807894099604488,
+      "recall@10": 1.0,
+      "mrr": 0.8614745736122131,
+      "map": 0.8614745736122131,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.7585025046137622,
+      "recall@5": 0.9659899815449512,
+      "recall@10": 1.0,
+      "mrr": 0.8462231755256653,
+      "map": 0.8462231755256653,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/results/ablation_full_transition_without_query_conditioning_seed42.json

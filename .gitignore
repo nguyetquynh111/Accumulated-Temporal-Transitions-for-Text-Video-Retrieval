@@ -216,10 +216,9 @@ tempCodeRunnerFile.py
 # Metrics JSON and CSV in outputs/results/ are small and tracked; per-query
 # rankings (~6 MB each) go to Drive only.
 /outputs/results/**/rankings_*.jsonl
+/outputs/results/**/per_query_*.jsonl
 # Hugging Face downloads; re-downloaded on first use.
 /outputs/model_cache/
-# Slurm job logs and per-epoch training logs.
-/logs/
 # Drive upload archive (scripts/pack_artifacts.sbatch).
 /artifacts/
 

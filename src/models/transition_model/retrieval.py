@@ -24,6 +24,7 @@ from src.models.transition_model.transition import (
     NUM_HEADS,
     NUM_LAYERS,
     VIDEO_INPUTS,
+    TWO_GROUP_VIDEO_INPUTS,
     TransitionEncoder,
 )
 from src.models.transition_model.utils import TransitionDataset, collate_transitions
@@ -69,7 +70,7 @@ class TransitionRetrievalModel(nn.Module):
             "query_conditioned": query_conditioned,
             "video_input": video_input,
         }
-        if video_input == "state_transition":
+        if video_input in TWO_GROUP_VIDEO_INPUTS:
             self.video_encoder = TransitionEncoder(
                 2 * video_dim,
                 model_dim,

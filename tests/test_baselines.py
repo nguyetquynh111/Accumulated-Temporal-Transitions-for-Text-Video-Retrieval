@@ -114,7 +114,6 @@ class VjepaBaselineTests(unittest.TestCase):
         states = np.array([[0, 0], [1, 2], [4, 4]], dtype=np.float32)
         self.assertEqual(variant_sequence("pooled", states).shape, (1, 2))
         np.testing.assert_array_equal(variant_sequence("no_transition", states), states)
-        # The main model's tokens [z[t], z[t + 1] - z[t]].
         np.testing.assert_array_equal(
             variant_sequence("full_transition", states), [[0, 0, 1, 2], [1, 2, 3, 2]]
         )
@@ -202,7 +201,6 @@ class VjepaBaselineTests(unittest.TestCase):
                 )
                 self.assertEqual(len(load_jsonl(root / f"rankings_{variant}.jsonl")), 4)
 
-            # The main model trained by pipelines.train is evaluated as full_transition.
             main = train_transition_model(
                 train, val, features, root / "checkpoints", log_dir=root / "logs",
                 epochs=1, batch_size=4, text_encoder="mock", device="cpu",
