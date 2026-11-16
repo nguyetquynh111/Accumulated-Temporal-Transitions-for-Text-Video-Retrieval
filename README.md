@@ -25,44 +25,45 @@ conda activate attvr
 python -m pip install -r requirements.txt
 ```
 
-## Shared artifacts (Google Drive)
+## Reproduce all generated files
 
-Large generated files are not in Git. They are shared in a private team folder:
-<!-- TODO: add the Drive folder link -->
-**Drive folder:** `<DRIVE_FOLDER_LINK>`
-
-The folder holds one archive, `attvr_artifacts.zip`, with:
-
-| Folder | Contents |
-|---|---|
-| `data/annotations/` | Splits, hard negatives, action contrast, opposite label pairs |
-| `outputs/features/vjepa/` | V-JEPA 2 features, one `.npz` per video (193,690 files) |
-| `outputs/features/clip/` | CLIP features for the test videos |
-| `outputs/checkpoints/` | Best checkpoint of every trained model and seed |
-| `outputs/results/` | Metrics JSON and per-query rankings |
-| `logs/` | Slurm logs and per-epoch training logs |
-
-Not on Drive:
-
-- `data/videos/` and `data/raw_metadata/`: SSv2 terms do not allow
-  redistribution. Download them from the official source (see
-  [Prepare data](#prepare-data)). Videos are only needed to extract features
-  again or to run the CLIP baseline on new videos.
-- `outputs/model_cache/`: Hugging Face weights, downloaded on first use.
-
-Download `attvr_artifacts.zip` into `artifacts/` (ignored by Git) and unpack from the repository
-root. Paths in the zip are relative to the root, so files land in the folders
-above:
+Large generated files (annotations, features, checkpoints, results, logs) are
+not in Git. Rebuild them with one script, after putting the SSv2 metadata in
+`data/raw_metadata/` and the videos in `data/videos/` (see
+[Prepare data](#prepare-data)):
 
 ```bash
-unzip artifacts/attvr_artifacts.zip
+conda activate attvr
+bash scripts/reproduce_all.sh      # all steps
+bash scripts/reproduce_all.sh 4    # resume from step 4
 ```
 
-To refresh the Drive copy after new runs, rebuild the zip and upload it again:
+| Step | What it runs | Writes |
+|---|---|---|
+| 1 | Splits and candidate sets | `data/annotations/` |
+| 2 | V-JEPA 2 feature extraction (GPU) | `outputs/features/vjepa/` |
+| 3 | CLIP baseline (B1), V-JEPA baseline (B2), ablations, E2 stage 1 | `outputs/features/clip/`, `outputs/checkpoints/`, `outputs/results/` |
+| 4 | Single-stage transition model, 3 seeds | same |
+| 5 | E1 stage 1 (states-only encoder), 3 seeds | same |
+| 6 | Stage 2 token-level matcher for E2 and E1, then reverse-time evaluation | same |
 
-```bash
-bash scripts/pack_artifacts.sbatch   # or: sbatch scripts/pack_artifacts.sbatch
-```
+Per-epoch training logs go to `logs/`. Hugging Face weights are downloaded to
+`outputs/model_cache/` on first use.
+
+All randomness is seeded. The split uses `--seed 42`, with the validation
+entries sorted by video ID before the seeded permutation; the hard-negative and
+action-contrast sets use `RANDOM_SEED` from `config.py` (42, override with
+`ATTVR_RANDOM_SEED`); every model is trained with seeds 42, 43, and 44. With
+these defaults, the splits and candidate sets come out byte-identical. Trained
+checkpoints are seeded too, but GPU kernels are not bit-exact, so metrics can
+differ slightly in the last digits.
+
+On Slurm, submit the same steps in order, waiting for each to finish:
+`bash scripts/submit_single_stage.sh` (steps 2 and 4),
+`bash scripts/submit_baselines.sh` (step 3),
+`sbatch scripts/train_token_matcher.sbatch --encoder full_transition --seeds 42 43 44`
+(E2 stage 2), then `bash scripts/submit_main_experiment.sh` (steps 5 and 6 for
+E1, and E2 evaluation with reverse time). Step 1 runs on CPU in a few minutes.
 
 ## Prepare data
 
@@ -126,7 +127,7 @@ The splitting procedure sorts the original validation entries by video ID before
 
 The generated annotations reference video files under `data/videos/` by default. The corresponding SSv2 videos must be obtained separately to run video-based models.
 
-**Note:** The `data/` directory is excluded from Git. Generate the annotation files locally from authorized official metadata, or unpack `annotations.tar.gz` from the [shared Drive folder](#shared-artifacts-google-drive).
+**Note:** The `data/` directory is excluded from Git. Generate the annotation files locally from authorized official metadata.
 
 ### 4. Build the hard-negative and action-contrast sets
 
@@ -344,7 +345,7 @@ sources `scripts/env.sh`, which activates the `attvr` Conda env (override with
 | `sbatch scripts/train_token_matcher.sbatch` | Stage 2 token-level matcher; extra arguments are passed through |
 | `sbatch scripts/train_vjepa_variants.sbatch` | Array: `pooled` (B2) and the ablations; `--array=0` runs B2 only |
 | `sbatch scripts/build_tables.sbatch` | Comparison table and error-analysis figures |
-| `sbatch scripts/pack_artifacts.sbatch` | `artifacts/attvr_artifacts.zip` for the [shared Drive folder](#shared-artifacts-google-drive) |
+| `bash scripts/reproduce_all.sh [step]` | Every step above in order on one machine (see [Reproduce all generated files](#reproduce-all-generated-files)) |
 
 Run tests with `python -m pytest`. See [Tickets](docs/Tickets.md) for interfaces,
 [PRD](docs/PRD.md) for project details, and [Owners](docs/OWNERS.md) for team responsibilities.
