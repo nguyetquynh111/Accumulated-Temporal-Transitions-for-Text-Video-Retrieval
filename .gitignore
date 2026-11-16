@@ -207,20 +207,18 @@ tempCodeRunnerFile.py
 .DS_Store
 
 # Project-local datasets and generated artifacts.
-# Large artifacts are shared through Google Drive (see README "Shared artifacts").
+# Rebuild them with scripts/reproduce_all.sh (see README).
 /data/
 /outputs/features/*
 !/outputs/features/.gitkeep
 /outputs/checkpoints/*
 !/outputs/checkpoints/.gitkeep
 # Metrics JSON and CSV in outputs/results/ are small and tracked; per-query
-# rankings (~6 MB each) go to Drive only.
+# rankings (~6 MB each) are not tracked.
 /outputs/results/**/rankings_*.jsonl
 /outputs/results/**/per_query_*.jsonl
 # Hugging Face downloads; re-downloaded on first use.
 /outputs/model_cache/
-# Drive upload archive (scripts/pack_artifacts.sbatch).
-/artifacts/
 
 # LaTeX build files for paper/
 paper/**/*.aux
