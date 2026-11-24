@@ -272,9 +272,23 @@ class VjepaBaselineTests(unittest.TestCase):
                 root / "transition_only_reversed.json",
                 hard_negatives=hard,
                 action_contrast=contrast,
+                rankings_path=root / "rankings_reversed.jsonl",
                 device="cpu",
                 reverse_time=True,
+                per_query_path=root / "per_query_reversed.jsonl",
             )
+            per_query = load_jsonl(root / "per_query_reversed.jsonl")
+            self.assertEqual([r["query_id"] for r in per_query], [f"val_q{i}" for i in range(4)])
+            self.assertEqual(
+                set(per_query[0]), {"query_id", "full_rank", "hard_negative_rank", "action_contrast_rank"}
+            )
+            rankings = {r["query_id"]: r for r in load_jsonl(root / "rankings_reversed.jsonl")}
+            for record in per_query:
+                self.assertEqual(record["full_rank"], rankings[record["query_id"]]["target_rank"])
+            self.assertIn(per_query[0]["hard_negative_rank"], (1, 2, 3))
+            self.assertIn(per_query[0]["action_contrast_rank"], (1, 2))
+            self.assertIsNone(per_query[1]["hard_negative_rank"])
+            self.assertIsNone(per_query[1]["action_contrast_rank"])
             self.assertTrue(reversed_result["reverse_time"])
             self.assertEqual(reversed_result["variant"], "transition_only")
             self.assertEqual(reversed_result["full"]["num_candidates"], 4)

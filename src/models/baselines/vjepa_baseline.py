@@ -70,6 +70,7 @@ from src.models.transition_model.pipelines.train import (
     fit_retrieval_model,
     log_path,
 )
+from src.models.transition_model.pipelines.train_token_reranker import per_query_records
 from src.models.transition_model.retrieval import (
     TransitionRetrievalModel,
     load_checkpoint,
@@ -326,8 +327,12 @@ def evaluate_candidate_file(
     texts: np.ndarray,
     feature_dir: Path,
     reverse_time: bool = False,
+    ranks_out: dict[str, int] | None = None,
 ) -> tuple[dict | None, int]:
-    """Score one hard-negative-schema file; (None, 0) when it is missing or empty."""
+    """Score one hard-negative-schema file; (None, 0) when it is missing or empty.
+
+    ranks_out, if given, is filled with query_id -> target rank in that set.
+    """
     candidate_rows = read_hard_negative_rows(path, rows)
     available = {
         v for v in hard_negative_video_ids(candidate_rows) if feature_path(feature_dir, v).exists()
@@ -344,6 +349,7 @@ def evaluate_candidate_file(
         video_ids,
         videos,
         lambda text, candidates: score_transition_retrieval(text, candidates, model),
+        ranks_out=ranks_out,
     )
     return metrics, skipped
 
@@ -529,10 +535,14 @@ def evaluate_variant(
     device: str | None = None,
     limit: int | None = None,
     reverse_time: bool = False,
+    per_query_path: Path | None = None,
 ) -> dict:
     """Evaluate one variant checkpoint on full, hard-negative, and action-contrast retrieval.
 
     With reverse_time, every video's states are reversed before its input is built.
+    per_query_path, if given, gets one line per query with the target rank on the
+    full split, the hard-negative set, and the action-contrast set (null when the
+    query is not in that set), the format T3.2's paired bootstrap reads.
     """
     device = get_device(device)
     model, checkpoint = load_checkpoint(checkpoint_path, device)
@@ -573,9 +583,11 @@ def evaluate_variant(
         reverse_time=reverse_time,
         skipped_missing_features=skipped,
     )
+    set_ranks = {}
     for key, path in (("hard_negative", hard_negatives), ("action_contrast", action_contrast)):
+        set_ranks[key] = {}
         metrics, set_skipped = evaluate_candidate_file(
-            model, variant, path, rows, texts, feature_dir, reverse_time
+            model, variant, path, rows, texts, feature_dir, reverse_time, set_ranks[key]
         )
         result[key] = metrics
         result[f"{key}_skipped"] = set_skipped
@@ -583,6 +595,8 @@ def evaluate_variant(
     save_metrics(result, output_path)
     if rankings_path is not None:
         save_jsonl(ranking_records(name, rows, scores, candidates), rankings_path)
+    if per_query_path is not None:
+        save_jsonl(per_query_records(rows, scores, candidates, set_ranks), per_query_path)
     return result
 
 
@@ -699,6 +713,7 @@ def main() -> None:
                 device=args.device,
                 limit=args.limit,
                 reverse_time=args.reverse_time,
+                per_query_path=args.result_dir / f"per_query_{stem}.jsonl",
             )
             summary = {
                 key: result[key]

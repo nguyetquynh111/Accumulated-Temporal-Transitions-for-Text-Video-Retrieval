@@ -109,11 +109,14 @@ def evaluate_hard_negatives(
     video_ids: list[str],
     video_embeddings: np.ndarray,
     score_fn: Callable[[np.ndarray, np.ndarray], np.ndarray],
+    ranks_out: dict[str, int] | None = None,
 ) -> dict:
     """Score each hard-negative row against only its own candidates.
 
     score_fn maps text embeddings (1, D_text) and candidate embeddings (n, D)
     to scores (1, n), so every model can reuse this with its own scorer.
+    ranks_out, if given, is filled with query_id -> 1-based target rank among
+    that row's candidates (stable tie rule, as in ranking_records).
     """
     text_by_query = dict(zip(query_ids(rows), text_embeddings))
     video_index = {video_id: i for i, video_id in enumerate(video_ids)}
@@ -126,6 +129,10 @@ def evaluate_hard_negatives(
             video_embeddings[[video_index[v] for v in candidates]],
         )[0]
         score_lookup.update({(query_id, v): float(s) for v, s in zip(candidates, scores)})
+        if ranks_out is not None:
+            order = np.argsort(-np.asarray(scores, dtype=np.float32), kind="stable")
+            target = candidates.index(str(row["target_video_id"]))
+            ranks_out[query_id] = int(np.where(order == target)[0][0]) + 1
     return summarize_candidate_set(hard_rows, score_lookup)
 
 

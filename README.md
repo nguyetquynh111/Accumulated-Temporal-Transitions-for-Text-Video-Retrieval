@@ -289,7 +289,11 @@ E2 evaluation, and reverse-time evaluation of both.
 Every runner below scores `test.jsonl`, writes metrics to
 `outputs/results/<model>.json` (`<model>_seed<seed>.json` for trained V-JEPA
 variants), and writes per-query rankings to `outputs/results/rankings_<...>.jsonl`
-for error analysis.
+for error analysis. Trained V-JEPA variants also write
+`per_query_<model>_seed<seed>.jsonl` (target rank on the full split, the
+hard-negative set, and the action-contrast set; `null` when a query is not in a
+set), the same format as the main experiment, for the T3.2 paired bootstrap
+(e.g. the main model against `ablation_no_transition`).
 
 CLIP frame averaging (B1, zero-shot; caches features in `outputs/features/clip/`):
 
