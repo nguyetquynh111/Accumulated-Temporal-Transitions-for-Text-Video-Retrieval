@@ -22,6 +22,8 @@ Note that the mean of z[t + 1] - z[t] telescopes to (z[T] - z[1]) / (T - 1), and
 the model's input LayerNorm removes that scale, so mean_transition and
 final_minus_initial see the same input up to a constant factor.
 
+A finished checkpoint is evaluated instead of retrained (its result JSON is kept
+and checked); pass --retrain to train again and overwrite both.
 With --reverse-time, trained checkpoints are re-evaluated with each video's
 states reversed in time before the variant input (and its transitions) is built.
 """
@@ -44,7 +46,6 @@ from config import (
     RESULT_ROOT,
     TEXT_MODEL_NAME,
 )
-from src.eval.evaluate import save_metrics
 from src.models.baselines.common import (
     build_result,
     candidate_ids,
@@ -70,7 +71,10 @@ from src.models.transition_model.pipelines.train import (
     fit_retrieval_model,
     log_path,
 )
-from src.models.transition_model.pipelines.train_token_reranker import per_query_records
+from src.models.transition_model.pipelines.train_token_reranker import (
+    per_query_records,
+    save_result,
+)
 from src.models.transition_model.retrieval import (
     TransitionRetrievalModel,
     load_checkpoint,
@@ -174,6 +178,12 @@ def prepare_states(
 def main_checkpoint_path(checkpoint_dir: Path = CHECKPOINT_ROOT, seed: int = RANDOM_SEED) -> Path:
     """Return the main model's best checkpoint for one seed, as pipelines.train saves it."""
     return checkpoint_path(checkpoint_dir, MAIN_RUN_NAME, seed)
+
+
+def training_finished(path: Path) -> bool:
+    """Return whether a checkpoint comes from a completed run (T2.4 stores its summary last)."""
+    _, checkpoint = load_checkpoint(path, "cpu")
+    return bool(checkpoint.get("training_summary"))
 
 
 def variant_sequence(
@@ -536,6 +546,7 @@ def evaluate_variant(
     limit: int | None = None,
     reverse_time: bool = False,
     per_query_path: Path | None = None,
+    overwrite: bool = True,
 ) -> dict:
     """Evaluate one variant checkpoint on full, hard-negative, and action-contrast retrieval.
 
@@ -543,6 +554,7 @@ def evaluate_variant(
     per_query_path, if given, gets one line per query with the target rank on the
     full split, the hard-negative set, and the action-contrast set (null when the
     query is not in that set), the format T3.2's paired bootstrap reads.
+    With overwrite=False an existing result file is kept and compared instead.
     """
     device = get_device(device)
     model, checkpoint = load_checkpoint(checkpoint_path, device)
@@ -592,7 +604,7 @@ def evaluate_variant(
         result[key] = metrics
         result[f"{key}_skipped"] = set_skipped
 
-    save_metrics(result, output_path)
+    save_result(result, output_path, overwrite)
     if rankings_path is not None:
         save_jsonl(ranking_records(name, rows, scores, candidates), rankings_path)
     if per_query_path is not None:
@@ -656,7 +668,14 @@ def main() -> None:
         action="store_true",
         help="re-evaluate trained checkpoints with states reversed in time (no training)",
     )
+    parser.add_argument(
+        "--retrain",
+        action="store_true",
+        help="train even if a checkpoint exists, overwriting it and its results",
+    )
     args = parser.parse_args()
+    if args.retrain and (args.reverse_time or args.checkpoint is not None):
+        parser.error("--retrain cannot be combined with --reverse-time or --checkpoint")
 
     variants = []
     for variant in args.variant:
@@ -668,14 +687,23 @@ def main() -> None:
     for variant in variants:
         for seed in args.seeds:
             checkpoint = args.checkpoint
+            reused = False
             if checkpoint is None and variant == "full_transition":
                 checkpoint = main_checkpoint_path(args.checkpoint_dir, seed)
                 if not checkpoint.exists():
                     parser.error(f"missing main checkpoint: {checkpoint}")
-            if checkpoint is None and args.reverse_time:
-                checkpoint = checkpoint_path(args.checkpoint_dir, result_name(variant), seed)
-                if not checkpoint.exists():
-                    parser.error(f"--reverse-time needs a trained checkpoint: {checkpoint}")
+            if checkpoint is None and not args.retrain:
+                existing = checkpoint_path(args.checkpoint_dir, result_name(variant), seed)
+                if existing.exists():
+                    if not training_finished(existing):
+                        parser.error(
+                            f"{existing} is from an unfinished run; if no job is still "
+                            "training it, pass --retrain to replace it"
+                        )
+                    print(f"Reusing {existing} (pass --retrain to train again)")
+                    checkpoint, reused = existing, True
+                elif args.reverse_time:
+                    parser.error(f"--reverse-time needs a trained checkpoint: {existing}")
             if checkpoint is None:
                 checkpoint = train_variant_model(
                     variant,
@@ -714,6 +742,7 @@ def main() -> None:
                 limit=args.limit,
                 reverse_time=args.reverse_time,
                 per_query_path=args.result_dir / f"per_query_{stem}.jsonl",
+                overwrite=not reused,
             )
             summary = {
                 key: result[key]

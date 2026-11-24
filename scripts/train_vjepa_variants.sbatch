@@ -2,6 +2,7 @@
 # B2, the T3.3 ablations, and rankings for the main model. One GPU per variant.
 # Every trained variant uses the same data, epochs, and evaluator as the main model,
 # with seeds 42, 43, 44 (pass --seeds to override).
+# Finished checkpoints are re-evaluated, not retrained (pass --retrain to overwrite them).
 # full_transition only evaluates the main checkpoint (for error-analysis rankings).
 # Pass --reverse-time to re-evaluate the trained checkpoints with states reversed.
 #SBATCH --job-name=attvr-variant

@@ -320,6 +320,11 @@ without transitions (B2), and `all_ablations` runs the six T3.3 variants:
 python -m src.models.baselines.vjepa_baseline --variant pooled all_ablations --seeds 42 43 44
 ```
 
+A finished checkpoint is reused: it is evaluated again (writing rankings and
+per-query ranks) and its existing result JSON is kept and compared. Pass
+`--retrain` to train again and overwrite both. This matters for
+`full_transition_without_query_conditioning`, whose checkpoints are stage 1 of E2.
+
 Re-evaluate the trained checkpoints with each video's states reversed in time
 before the variant input is built (no training; writes
 `<model>_seed<seed>_reversed.json` and the matching rankings):

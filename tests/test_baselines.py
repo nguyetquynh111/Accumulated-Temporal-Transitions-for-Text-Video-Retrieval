@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
+import torch
 
 from src.models.baselines.clip_baseline import (
     encode_clip_frames,
@@ -25,6 +26,7 @@ from src.models.baselines.vjepa_baseline import (
     VariantDataset,
     evaluate_variant,
     fixed_permutation,
+    main as vjepa_main,
     main_checkpoint_path,
     prepare_states,
     result_name,
@@ -327,6 +329,61 @@ class VjepaBaselineTests(unittest.TestCase):
                     root / "bad.json",
                     device="cpu",
                 )
+
+    def test_cli_reuses_finished_checkpoints(self):
+        rng = np.random.default_rng(0)
+        texts = ["pushing left", "pushing right", "opening box", "closing box"]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            features = root / "features"
+            video_ids = [f"v{i}" for i in range(12)]
+            for vid in video_ids:
+                save_video_feature_cache(vid, np.arange(8), rng.normal(size=(8, 16)), features, "mock")
+            train = write_split(root, "train", video_ids[:8], texts * 2)
+            val = write_split(root, "val", video_ids[8:], texts)
+
+            def run(*extra):
+                argv = [
+                    "vjepa_baseline", "--variant", "no_transition", "--seeds", "42",
+                    "--train-annotations", str(train), "--val-annotations", str(val),
+                    "--test-annotations", str(val), "--feature-dir", str(features),
+                    "--checkpoint-dir", str(root / "ck"), "--log-dir", str(root / "logs"),
+                    "--result-dir", str(root / "r"), "--hard-negatives", str(root / "none"),
+                    "--action-contrast", str(root / "none"), "--text-encoder", "mock",
+                    "--device", "cpu", "--epochs", "1", "--batch-size", "4", *extra,
+                ]
+                with patch("sys.argv", argv):
+                    vjepa_main()
+
+            name = "ablation_no_transition_seed42"
+            checkpoint = root / "ck" / f"{name}_best.pt"
+            result = root / "r" / f"{name}.json"
+            per_query = root / "r" / f"per_query_{name}.jsonl"
+            run()
+            trained, saved = checkpoint.read_bytes(), result.read_bytes()
+            per_query.unlink()
+
+            # Reused: checkpoint and result are untouched, per-query ranks are written.
+            target = "src.models.baselines.vjepa_baseline.train_variant_model"
+            with patch(target, side_effect=AssertionError("retrained")):
+                run()
+            self.assertEqual(checkpoint.read_bytes(), trained)
+            self.assertEqual(result.read_bytes(), saved)
+            self.assertEqual(len(load_jsonl(per_query)), 4)
+
+            with patch(target, return_value=checkpoint) as retrain:
+                run("--retrain")
+            retrain.assert_called_once()
+
+            # An interrupted run (no training_summary) is neither reused nor overwritten.
+            partial = torch.load(checkpoint, map_location="cpu")
+            del partial["training_summary"]
+            torch.save(partial, checkpoint)
+            interrupted = checkpoint.read_bytes()
+            for extra in ((), ("--reverse-time",)):
+                with patch("sys.stderr"), self.assertRaises(SystemExit):
+                    run(*extra)
+            self.assertEqual(checkpoint.read_bytes(), interrupted)
 
 
 class ErrorAnalysisTests(unittest.TestCase):
