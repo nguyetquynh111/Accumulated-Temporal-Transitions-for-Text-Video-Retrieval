@@ -22,8 +22,11 @@ from src.models.baselines.error_analysis import (
 )
 from src.models.baselines.vjepa_baseline import (
     ABLATION_VARIANTS,
+    VariantDataset,
     evaluate_variant,
+    fixed_permutation,
     main_checkpoint_path,
+    prepare_states,
     result_name,
     run_transition_ablation,
     score_vjepa_baseline,
@@ -119,8 +122,61 @@ class VjepaBaselineTests(unittest.TestCase):
         )
         np.testing.assert_array_equal(variant_sequence("final_minus_initial", states), [[4, 4]])
         np.testing.assert_array_equal(variant_sequence("mean_transition", states), [[2, 2]])
+        np.testing.assert_array_equal(
+            variant_sequence("transition_only", states), [[1, 2], [3, 2]]
+        )
+        np.testing.assert_array_equal(variant_sequence("shuffled_states", states), states)
+        self.assertEqual(variant_video_input("transition_only"), "transition")
+        self.assertEqual(variant_video_input("shuffled_states"), "transition")
+        self.assertEqual(
+            ABLATION_VARIANTS,
+            (
+                "no_transition",
+                "transition_only",
+                "shuffled_states",
+                "mean_transition",
+                "final_minus_initial",
+                "full_transition_without_query_conditioning",
+            ),
+        )
         with self.assertRaises(ValueError):
             variant_sequence("unknown", states)
+
+    def test_reverse_time_and_state_shuffling(self):
+        states = np.arange(16, dtype=np.float32).reshape(8, 2)
+        reversed_states = prepare_states("no_transition", states, "v1", reverse_time=True)
+        np.testing.assert_array_equal(reversed_states, states[::-1])
+        np.testing.assert_array_equal(prepare_states("no_transition", states, "v1"), states)
+        # Reversal happens before transitions are computed, so they flip sign and order.
+        np.testing.assert_array_equal(
+            variant_sequence("transition_only", reversed_states),
+            -variant_sequence("transition_only", states)[::-1],
+        )
+
+        # Evaluation: one fixed permutation per video id, stable across calls.
+        order = fixed_permutation("v1", 8)
+        self.assertEqual(sorted(order.tolist()), list(range(8)))
+        np.testing.assert_array_equal(order, fixed_permutation("v1", 8))
+        self.assertFalse(np.array_equal(order, np.arange(8)))
+        np.testing.assert_array_equal(prepare_states("shuffled_states", states, "v1"), states[order])
+        self.assertFalse(np.array_equal(order, fixed_permutation("v2", 8)))
+
+        # Training: a fresh permutation on every load, reproducible from the seed.
+        with tempfile.TemporaryDirectory() as tmp:
+            features = Path(tmp)
+            save_video_feature_cache("v1", np.arange(8), states, features, "mock")
+            train = VariantDataset("shuffled_states", ["v1"], [0], features, shuffle_seed=42)
+            draws = [train[0][0] for _ in range(4)]
+            for draw in draws:
+                self.assertEqual(sorted(draw[:, 0].tolist()), sorted(states[:, 0].tolist()))
+            self.assertGreater(len({draw.tobytes() for draw in draws}), 1)
+            again = VariantDataset("shuffled_states", ["v1"], [0], features, shuffle_seed=42)
+            np.testing.assert_array_equal(again[0][0], draws[0])
+            evaluation = VariantDataset("shuffled_states", ["v1"], [0], features)
+            np.testing.assert_array_equal(evaluation[0][0], evaluation[0][0])
+            np.testing.assert_array_equal(evaluation[0][0], states[order])
+            ordered = VariantDataset("no_transition", ["v1"], [0], features, shuffle_seed=42)
+            np.testing.assert_array_equal(ordered[0][0], states)
 
     def test_untrained_scoring_keeps_candidate_order(self):
         states = {"a": np.array([[0, 0], [1, 0]]), "b": np.array([[0, 0], [0, 1]])}
@@ -128,6 +184,12 @@ class VjepaBaselineTests(unittest.TestCase):
         scores = run_transition_ablation("final_minus_initial", texts, states, {})
         np.testing.assert_array_equal(scores, [[1, 0], [0, 1]])
         np.testing.assert_array_equal(score_vjepa_baseline(texts, texts), np.eye(2))
+        # Reversed in time, z[T] - z[1] flips sign; stale cached transitions are ignored.
+        stale = {"a": np.array([[9.0, 9.0]]), "b": np.array([[9.0, 9.0]])}
+        reversed_scores = run_transition_ablation(
+            "transition_only", texts, states, stale, reverse_time=True
+        )
+        np.testing.assert_array_equal(reversed_scores, [[-1, 0], [0, -1]])
 
     def test_train_and_evaluate_variants_end_to_end(self):
         rng = np.random.default_rng(0)
@@ -200,6 +262,34 @@ class VjepaBaselineTests(unittest.TestCase):
                     result["action_contrast"]["by_negative_type"]["opposite_action"]["num_negatives"], 1
                 )
                 self.assertEqual(len(load_jsonl(root / f"rankings_{variant}.jsonl")), 4)
+                self.assertFalse(result["reverse_time"])
+
+            reversed_result = evaluate_variant(
+                "transition_only",
+                root / "checkpoints" / "ablation_transition_only_seed42_best.pt",
+                val,
+                features,
+                root / "transition_only_reversed.json",
+                hard_negatives=hard,
+                action_contrast=contrast,
+                device="cpu",
+                reverse_time=True,
+            )
+            self.assertTrue(reversed_result["reverse_time"])
+            self.assertEqual(reversed_result["variant"], "transition_only")
+            self.assertEqual(reversed_result["full"]["num_candidates"], 4)
+            self.assertEqual(reversed_result["action_contrast"]["num_queries"], 1)
+
+            # Same model config, different trained variant: rejected by the stored variant.
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                evaluate_variant(
+                    "shuffled_states",
+                    root / "checkpoints" / "ablation_no_transition_seed42_best.pt",
+                    val,
+                    features,
+                    root / "bad_shuffled.json",
+                    device="cpu",
+                )
 
             main = train_transition_model(
                 train, val, features, root / "checkpoints", log_dir=root / "logs",
