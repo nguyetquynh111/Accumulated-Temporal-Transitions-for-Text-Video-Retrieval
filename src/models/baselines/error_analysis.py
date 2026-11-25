@@ -348,8 +348,15 @@ def main() -> None:
         "--rankings",
         type=Path,
         nargs="+",
-        default=sorted(RESULT_ROOT.glob("rankings_*.jsonl")),
-        help="ranking files to analyze (default: every rankings_*.jsonl in outputs/results)",
+        default=sorted(
+            path
+            for path in RESULT_ROOT.glob("rankings_*.jsonl")
+            if not path.stem.endswith("_reversed")
+        ),
+        help=(
+            "ranking files to analyze (default: every rankings_*.jsonl in outputs/results "
+            "except reverse-time evaluations)"
+        ),
     )
     parser.add_argument("--annotations", type=Path, default=ANNOTATION_ROOT / "test.jsonl")
     parser.add_argument("--output", type=Path, default=RESULT_ROOT / "error_analysis.json")
