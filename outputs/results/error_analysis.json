@@ -1,0 +1,2363 @@
+{
+  "annotations": "data/annotations/test.jsonl",
+  "comparisons": [
+    {
+      "examples": [
+        {
+          "query_id": "test_100849",
+          "target_video_id": "100849",
+          "text_query": "trying to bend a hammer so nothing happens",
+          "vjepa_baseline_target_rank": 2,
+          "vjepa_baseline_top_video_ids": [
+            "152847",
+            "100849",
+            "37393",
+            "64357",
+            "95737"
+          ]
+        },
+        {
+          "query_id": "test_100933",
+          "target_video_id": "100933",
+          "text_query": "rolling ball on a flat surface",
+          "vjepa_baseline_target_rank": 73,
+          "vjepa_baseline_top_video_ids": [
+            "90243",
+            "176356",
+            "18135",
+            "116326",
+            "59287"
+          ]
+        },
+        {
+          "query_id": "test_100955",
+          "target_video_id": "100955",
+          "text_query": "moving toothpaste up",
+          "vjepa_baseline_target_rank": 3,
+          "vjepa_baseline_top_video_ids": [
+            "220385",
+            "151677",
+            "100955",
+            "75999",
+            "1282"
+          ]
+        }
+      ],
+      "loser": "vjepa_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 402,
+      "winner": "clip_baseline"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100595",
+          "target_video_id": "100595",
+          "text_query": "tipping hand soap over",
+          "two_stage_token_reranker_state_only_target_rank": 15,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "139494",
+            "216360",
+            "200105",
+            "67980",
+            "55178"
+          ]
+        },
+        {
+          "query_id": "test_100933",
+          "target_video_id": "100933",
+          "text_query": "rolling ball on a flat surface",
+          "two_stage_token_reranker_state_only_target_rank": 81,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "18932",
+            "90243",
+            "99400",
+            "92487",
+            "68087"
+          ]
+        },
+        {
+          "query_id": "test_10098",
+          "target_video_id": "10098",
+          "text_query": "unfolding a pink sticky note",
+          "two_stage_token_reranker_state_only_target_rank": 2,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "83119",
+            "10098",
+            "115429",
+            "172789",
+            "29703"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker_state_only",
+      "num_shared_queries": 12389,
+      "num_wins": 390,
+      "winner": "clip_baseline"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100595",
+          "target_video_id": "100595",
+          "text_query": "tipping hand soap over",
+          "two_stage_token_reranker_target_rank": 4,
+          "two_stage_token_reranker_top_video_ids": [
+            "139494",
+            "77861",
+            "10652",
+            "100595",
+            "147513"
+          ]
+        },
+        {
+          "query_id": "test_100849",
+          "target_video_id": "100849",
+          "text_query": "trying to bend a hammer so nothing happens",
+          "two_stage_token_reranker_target_rank": 2,
+          "two_stage_token_reranker_top_video_ids": [
+            "162728",
+            "100849",
+            "111678",
+            "3030",
+            "102537"
+          ]
+        },
+        {
+          "query_id": "test_100933",
+          "target_video_id": "100933",
+          "text_query": "rolling ball on a flat surface",
+          "two_stage_token_reranker_target_rank": 153,
+          "two_stage_token_reranker_top_video_ids": [
+            "90243",
+            "202184",
+            "116326",
+            "63693",
+            "18932"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker",
+      "num_shared_queries": 12389,
+      "num_wins": 395,
+      "winner": "clip_baseline"
+    },
+    {
+      "examples": [
+        {
+          "clip_baseline_target_rank": 34,
+          "clip_baseline_top_video_ids": [
+            "8746",
+            "134169",
+            "195639",
+            "62821",
+            "177390"
+          ],
+          "query_id": "test_100406",
+          "target_video_id": "100406",
+          "text_query": "pretending to pick shoe up"
+        },
+        {
+          "clip_baseline_target_rank": 1035,
+          "clip_baseline_top_video_ids": [
+            "72705",
+            "37066",
+            "98603",
+            "98301",
+            "188857"
+          ],
+          "query_id": "test_100503",
+          "target_video_id": "100503",
+          "text_query": "dropping remote onto chair"
+        },
+        {
+          "clip_baseline_target_rank": 22,
+          "clip_baseline_top_video_ids": [
+            "175770",
+            "111677",
+            "189691",
+            "185757",
+            "204776"
+          ],
+          "query_id": "test_100534",
+          "target_video_id": "100534",
+          "text_query": "putting a battery and a coin on the table"
+        }
+      ],
+      "loser": "clip_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 1062,
+      "winner": "vjepa_baseline"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100534",
+          "target_video_id": "100534",
+          "text_query": "putting a battery and a coin on the table",
+          "two_stage_token_reranker_state_only_target_rank": 2,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "86438",
+            "100534",
+            "193509",
+            "2517",
+            "21719"
+          ]
+        },
+        {
+          "query_id": "test_100595",
+          "target_video_id": "100595",
+          "text_query": "tipping hand soap over",
+          "two_stage_token_reranker_state_only_target_rank": 15,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "139494",
+            "216360",
+            "200105",
+            "67980",
+            "55178"
+          ]
+        },
+        {
+          "query_id": "test_101194",
+          "target_video_id": "101194",
+          "text_query": "dropping yellow ball into orange cup",
+          "two_stage_token_reranker_state_only_target_rank": 5,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "204053",
+            "84278",
+            "220761",
+            "1452",
+            "101194"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker_state_only",
+      "num_shared_queries": 12389,
+      "num_wins": 522,
+      "winner": "vjepa_baseline"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100406",
+          "target_video_id": "100406",
+          "text_query": "pretending to pick shoe up",
+          "two_stage_token_reranker_target_rank": 5,
+          "two_stage_token_reranker_top_video_ids": [
+            "214592",
+            "177390",
+            "205607",
+            "207937",
+            "100406"
+          ]
+        },
+        {
+          "query_id": "test_100503",
+          "target_video_id": "100503",
+          "text_query": "dropping remote onto chair",
+          "two_stage_token_reranker_target_rank": 3,
+          "two_stage_token_reranker_top_video_ids": [
+            "152254",
+            "188962",
+            "100503",
+            "80909",
+            "124133"
+          ]
+        },
+        {
+          "query_id": "test_100534",
+          "target_video_id": "100534",
+          "text_query": "putting a battery and a coin on the table",
+          "two_stage_token_reranker_target_rank": 9,
+          "two_stage_token_reranker_top_video_ids": [
+            "21719",
+            "2517",
+            "86438",
+            "155670",
+            "58444"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker",
+      "num_shared_queries": 12389,
+      "num_wins": 631,
+      "winner": "vjepa_baseline"
+    },
+    {
+      "examples": [
+        {
+          "clip_baseline_target_rank": 5332,
+          "clip_baseline_top_video_ids": [
+            "150896",
+            "122203",
+            "86145",
+            "115139",
+            "189367"
+          ],
+          "query_id": "test_100405",
+          "target_video_id": "100405",
+          "text_query": "lifting rubber up completely, then letting it drop down"
+        },
+        {
+          "clip_baseline_target_rank": 34,
+          "clip_baseline_top_video_ids": [
+            "8746",
+            "134169",
+            "195639",
+            "62821",
+            "177390"
+          ],
+          "query_id": "test_100406",
+          "target_video_id": "100406",
+          "text_query": "pretending to pick shoe up"
+        },
+        {
+          "clip_baseline_target_rank": 1035,
+          "clip_baseline_top_video_ids": [
+            "72705",
+            "37066",
+            "98603",
+            "98301",
+            "188857"
+          ],
+          "query_id": "test_100503",
+          "target_video_id": "100503",
+          "text_query": "dropping remote onto chair"
+        }
+      ],
+      "loser": "clip_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 1263,
+      "winner": "two_stage_token_reranker_state_only"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100405",
+          "target_video_id": "100405",
+          "text_query": "lifting rubber up completely, then letting it drop down",
+          "vjepa_baseline_target_rank": 5,
+          "vjepa_baseline_top_video_ids": [
+            "160089",
+            "77758",
+            "63398",
+            "27055",
+            "100405"
+          ]
+        },
+        {
+          "query_id": "test_100849",
+          "target_video_id": "100849",
+          "text_query": "trying to bend a hammer so nothing happens",
+          "vjepa_baseline_target_rank": 2,
+          "vjepa_baseline_top_video_ids": [
+            "152847",
+            "100849",
+            "37393",
+            "64357",
+            "95737"
+          ]
+        },
+        {
+          "query_id": "test_100917",
+          "target_video_id": "100917",
+          "text_query": "pushing a staff toy so that it falls off the table",
+          "vjepa_baseline_target_rank": 21,
+          "vjepa_baseline_top_video_ids": [
+            "35659",
+            "110655",
+            "54257",
+            "113920",
+            "209128"
+          ]
+        }
+      ],
+      "loser": "vjepa_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 735,
+      "winner": "two_stage_token_reranker_state_only"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100405",
+          "target_video_id": "100405",
+          "text_query": "lifting rubber up completely, then letting it drop down",
+          "two_stage_token_reranker_target_rank": 2,
+          "two_stage_token_reranker_top_video_ids": [
+            "168047",
+            "100405",
+            "93029",
+            "8221",
+            "77758"
+          ]
+        },
+        {
+          "query_id": "test_100406",
+          "target_video_id": "100406",
+          "text_query": "pretending to pick shoe up",
+          "two_stage_token_reranker_target_rank": 5,
+          "two_stage_token_reranker_top_video_ids": [
+            "214592",
+            "177390",
+            "205607",
+            "207937",
+            "100406"
+          ]
+        },
+        {
+          "query_id": "test_100503",
+          "target_video_id": "100503",
+          "text_query": "dropping remote onto chair",
+          "two_stage_token_reranker_target_rank": 3,
+          "two_stage_token_reranker_top_video_ids": [
+            "152254",
+            "188962",
+            "100503",
+            "80909",
+            "124133"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker",
+      "num_shared_queries": 12389,
+      "num_wins": 667,
+      "winner": "two_stage_token_reranker_state_only"
+    },
+    {
+      "examples": [
+        {
+          "clip_baseline_target_rank": 56,
+          "clip_baseline_top_video_ids": [
+            "82991",
+            "208891",
+            "180388",
+            "180741",
+            "118293"
+          ],
+          "query_id": "test_100236",
+          "target_video_id": "100236",
+          "text_query": "pushing cable from left to right"
+        },
+        {
+          "clip_baseline_target_rank": 253,
+          "clip_baseline_top_video_ids": [
+            "10126",
+            "26012",
+            "84949",
+            "118117",
+            "18645"
+          ],
+          "query_id": "test_100314",
+          "target_video_id": "100314",
+          "text_query": "putting a key upright on the table, so it falls on its side"
+        },
+        {
+          "clip_baseline_target_rank": 674,
+          "clip_baseline_top_video_ids": [
+            "51727",
+            "128360",
+            "87275",
+            "50872",
+            "74681"
+          ],
+          "query_id": "test_100421",
+          "target_video_id": "100421",
+          "text_query": "pretending to take a jar from the table"
+        }
+      ],
+      "loser": "clip_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 1267,
+      "winner": "two_stage_token_reranker"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100236",
+          "target_video_id": "100236",
+          "text_query": "pushing cable from left to right",
+          "vjepa_baseline_target_rank": 2,
+          "vjepa_baseline_top_video_ids": [
+            "135241",
+            "100236",
+            "64058",
+            "67341",
+            "38085"
+          ]
+        },
+        {
+          "query_id": "test_100314",
+          "target_video_id": "100314",
+          "text_query": "putting a key upright on the table, so it falls on its side",
+          "vjepa_baseline_target_rank": 2,
+          "vjepa_baseline_top_video_ids": [
+            "53730",
+            "100314",
+            "133940",
+            "1108",
+            "212833"
+          ]
+        },
+        {
+          "query_id": "test_100421",
+          "target_video_id": "100421",
+          "text_query": "pretending to take a jar from the table",
+          "vjepa_baseline_target_rank": 4,
+          "vjepa_baseline_top_video_ids": [
+            "147322",
+            "50015",
+            "23480",
+            "100421",
+            "86525"
+          ]
+        }
+      ],
+      "loser": "vjepa_baseline",
+      "num_shared_queries": 12389,
+      "num_wins": 843,
+      "winner": "two_stage_token_reranker"
+    },
+    {
+      "examples": [
+        {
+          "query_id": "test_100236",
+          "target_video_id": "100236",
+          "text_query": "pushing cable from left to right",
+          "two_stage_token_reranker_state_only_target_rank": 2,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "38085",
+            "100236",
+            "189745",
+            "83261",
+            "196736"
+          ]
+        },
+        {
+          "query_id": "test_100314",
+          "target_video_id": "100314",
+          "text_query": "putting a key upright on the table, so it falls on its side",
+          "two_stage_token_reranker_state_only_target_rank": 3,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "53730",
+            "28512",
+            "100314",
+            "68373",
+            "133190"
+          ]
+        },
+        {
+          "query_id": "test_100421",
+          "target_video_id": "100421",
+          "text_query": "pretending to take a jar from the table",
+          "two_stage_token_reranker_state_only_target_rank": 16,
+          "two_stage_token_reranker_state_only_top_video_ids": [
+            "147322",
+            "182774",
+            "89400",
+            "4937",
+            "87209"
+          ]
+        }
+      ],
+      "loser": "two_stage_token_reranker_state_only",
+      "num_shared_queries": 12389,
+      "num_wins": 666,
+      "winner": "two_stage_token_reranker"
+    }
+  ],
+  "figures": [
+    "outputs/results/qualitative/clip_baseline_correct_objects_wrong_action_test_185895.png",
+    "outputs/results/qualitative/clip_baseline_wrong_temporal_direction_test_8564.png",
+    "outputs/results/qualitative/clip_baseline_similar_start_end_different_motion_test_211740.png",
+    "outputs/results/qualitative/clip_baseline_text_ambiguity_test_139431.png",
+    "outputs/results/qualitative/clip_baseline_visual_ambiguity_test_194702.png",
+    "outputs/results/qualitative/clip_baseline_encoder_failure_test_163711.png",
+    "outputs/results/qualitative/vjepa_baseline_correct_objects_wrong_action_test_194702.png",
+    "outputs/results/qualitative/vjepa_baseline_wrong_temporal_direction_test_188239.png",
+    "outputs/results/qualitative/vjepa_baseline_similar_start_end_different_motion_test_207648.png",
+    "outputs/results/qualitative/vjepa_baseline_text_ambiguity_test_40838.png",
+    "outputs/results/qualitative/vjepa_baseline_visual_ambiguity_test_185895.png",
+    "outputs/results/qualitative/vjepa_baseline_encoder_failure_test_163636.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_correct_objects_wrong_action_test_180111.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_wrong_temporal_direction_test_195222.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_similar_start_end_different_motion_test_64138.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_text_ambiguity_test_2199.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_visual_ambiguity_test_194702.png",
+    "outputs/results/qualitative/two_stage_token_reranker_state_only_encoder_failure_test_21655.png",
+    "outputs/results/qualitative/two_stage_token_reranker_correct_objects_wrong_action_test_136463.png",
+    "outputs/results/qualitative/two_stage_token_reranker_wrong_temporal_direction_test_129654.png",
+    "outputs/results/qualitative/two_stage_token_reranker_similar_start_end_different_motion_test_64506.png",
+    "outputs/results/qualitative/two_stage_token_reranker_text_ambiguity_test_188239.png",
+    "outputs/results/qualitative/two_stage_token_reranker_visual_ambiguity_test_194702.png",
+    "outputs/results/qualitative/two_stage_token_reranker_encoder_failure_test_183310.png"
+  ],
+  "ranking_files": [
+    "outputs/results/rankings_clip_baseline.jsonl",
+    "outputs/pr6_t33_ablations/results/rankings_vjepa_baseline_seed42.jsonl",
+    "outputs/results/rankings_two_stage_token_reranker_state_only_seed42.jsonl",
+    "outputs/results/rankings_two_stage_token_reranker_seed42.jsonl"
+  ],
+  "summary": {
+    "clip_baseline": {
+      "counts": {
+        "correct_objects_wrong_action": 5365,
+        "encoder_failure": 394,
+        "similar_start_end_different_motion": 36,
+        "text_ambiguity": 238,
+        "visual_ambiguity": 5697,
+        "wrong_action_ordering": 0,
+        "wrong_temporal_direction": 162
+      },
+      "examples": {
+        "correct_objects_wrong_action": [
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "clip_baseline",
+            "query_id": "test_185895",
+            "retrieved_label": "moving something closer to something",
+            "retrieved_video_id": "121577",
+            "target_label": "folding something",
+            "target_rank": 2640,
+            "target_video_id": "185895",
+            "text_query": "folding sun glasses",
+            "top_video_ids": [
+              "121577",
+              "134661",
+              "92283",
+              "63719",
+              "183008",
+              "104030",
+              "220130",
+              "205120",
+              "111964",
+              "181381"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "clip_baseline",
+            "query_id": "test_99704",
+            "retrieved_label": "approaching something with your camera",
+            "retrieved_video_id": "203039",
+            "target_label": "moving away from something with your camera",
+            "target_rank": 2,
+            "target_video_id": "99704",
+            "text_query": "moving away from traffic light with your camera",
+            "top_video_ids": [
+              "203039",
+              "99704",
+              "162440",
+              "13037",
+              "123821",
+              "157447",
+              "4338",
+              "36787",
+              "32166",
+              "197923"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "clip_baseline",
+            "query_id": "test_195222",
+            "retrieved_label": "moving something up",
+            "retrieved_video_id": "3668",
+            "target_label": "unfolding something",
+            "target_rank": 518,
+            "target_video_id": "195222",
+            "text_query": "unfolding a plastic bag",
+            "top_video_ids": [
+              "3668",
+              "91152",
+              "41029",
+              "19350",
+              "117395",
+              "134207",
+              "12888",
+              "71898",
+              "208898",
+              "54056"
+            ]
+          }
+        ],
+        "encoder_failure": [
+          {
+            "category": "encoder_failure",
+            "model_name": "clip_baseline",
+            "query_id": "test_163711",
+            "retrieved_label": "pushing something so that it slightly moves",
+            "retrieved_video_id": "80274",
+            "target_label": "turning the camera right while filming something",
+            "target_rank": 6212,
+            "target_video_id": "163711",
+            "text_query": "turning the camera right while filming board",
+            "top_video_ids": [
+              "80274",
+              "151510",
+              "75045",
+              "95371",
+              "120818",
+              "92283",
+              "77719",
+              "98287",
+              "145045",
+              "86401"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "clip_baseline",
+            "query_id": "test_20374",
+            "retrieved_label": "tearing something into two pieces",
+            "retrieved_video_id": "44842",
+            "target_label": "tearing something into two pieces",
+            "target_rank": 9271,
+            "target_video_id": "20374",
+            "text_query": "tearing a paper into two pieces",
+            "top_video_ids": [
+              "44842",
+              "127289",
+              "153414",
+              "195073",
+              "190260",
+              "113592",
+              "98420",
+              "133709",
+              "218395",
+              "44616"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "clip_baseline",
+            "query_id": "test_163685",
+            "retrieved_label": "pretending to open something without actually opening it",
+            "retrieved_video_id": "5685",
+            "target_label": "taking one of many similar things on the table",
+            "target_rank": 10369,
+            "target_video_id": "163685",
+            "text_query": "taking one of the glass bottles",
+            "top_video_ids": [
+              "5685",
+              "105503",
+              "199487",
+              "18697",
+              "55167",
+              "115005",
+              "17064",
+              "89949",
+              "25910",
+              "68397"
+            ]
+          }
+        ],
+        "similar_start_end_different_motion": [
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "clip_baseline",
+            "query_id": "test_211740",
+            "retrieved_label": "turning something upside down",
+            "retrieved_video_id": "25910",
+            "target_label": "pretending to turn something upside down",
+            "target_rank": 286,
+            "target_video_id": "211740",
+            "text_query": "pretending to turn green water bottle upside down",
+            "top_video_ids": [
+              "25910",
+              "140100",
+              "98136",
+              "192123",
+              "8445",
+              "17064",
+              "157285",
+              "115005",
+              "133154",
+              "176552"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "clip_baseline",
+            "query_id": "test_201242",
+            "retrieved_label": "putting something on a surface",
+            "retrieved_video_id": "44303",
+            "target_label": "pretending to put something on a surface",
+            "target_rank": 51,
+            "target_video_id": "201242",
+            "text_query": "pretending to put plant on a surface",
+            "top_video_ids": [
+              "44303",
+              "146718",
+              "44257",
+              "143361",
+              "175088",
+              "163872",
+              "14898",
+              "81792",
+              "30062",
+              "207123"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "clip_baseline",
+            "query_id": "test_68847",
+            "retrieved_label": "turning something upside down",
+            "retrieved_video_id": "118694",
+            "target_label": "pretending to turn something upside down",
+            "target_rank": 7,
+            "target_video_id": "68847",
+            "text_query": "pretending to turn a glass upside down",
+            "top_video_ids": [
+              "118694",
+              "164514",
+              "162371",
+              "147448",
+              "128300",
+              "128360",
+              "68847",
+              "16660",
+              "110847",
+              "17064"
+            ]
+          }
+        ],
+        "text_ambiguity": [
+          {
+            "category": "text_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_139431",
+            "retrieved_label": "opening something",
+            "retrieved_video_id": "1602",
+            "target_label": "opening something",
+            "target_rank": 16,
+            "target_video_id": "139431",
+            "text_query": "opening drawer",
+            "top_video_ids": [
+              "1602",
+              "8513",
+              "128477",
+              "183179",
+              "134585",
+              "19983",
+              "20655",
+              "18604",
+              "6175",
+              "203547"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_176187",
+            "retrieved_label": "tearing something into two pieces",
+            "retrieved_video_id": "44842",
+            "target_label": "tearing something into two pieces",
+            "target_rank": 1572,
+            "target_video_id": "176187",
+            "text_query": "tearing paper into two pieces",
+            "top_video_ids": [
+              "44842",
+              "153414",
+              "127289",
+              "98420",
+              "190260",
+              "195073",
+              "104699",
+              "133709",
+              "113592",
+              "218395"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_214567",
+            "retrieved_label": "tearing something into two pieces",
+            "retrieved_video_id": "44842",
+            "target_label": "tearing something into two pieces",
+            "target_rank": 10599,
+            "target_video_id": "214567",
+            "text_query": "tearing paper into two pieces",
+            "top_video_ids": [
+              "44842",
+              "153414",
+              "127289",
+              "98420",
+              "190260",
+              "195073",
+              "104699",
+              "133709",
+              "113592",
+              "218395"
+            ]
+          }
+        ],
+        "visual_ambiguity": [
+          {
+            "category": "visual_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_194702",
+            "retrieved_label": "lifting something with something on it",
+            "retrieved_video_id": "139537",
+            "target_label": "sprinkling something onto something",
+            "target_rank": 83,
+            "target_video_id": "194702",
+            "text_query": "sprinkling water onto a mirror",
+            "top_video_ids": [
+              "139537",
+              "38795",
+              "145107",
+              "62321",
+              "99215",
+              "202728",
+              "60258",
+              "188691",
+              "169768",
+              "148628"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_188239",
+            "retrieved_label": "moving something and something away from each other",
+            "retrieved_video_id": "42754",
+            "target_label": "pulling something from left to right",
+            "target_rank": 853,
+            "target_video_id": "188239",
+            "text_query": "pulling mobile phone from left to right",
+            "top_video_ids": [
+              "42754",
+              "76050",
+              "210319",
+              "124792",
+              "68808",
+              "6551",
+              "6848",
+              "214911",
+              "104460",
+              "58865"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "clip_baseline",
+            "query_id": "test_163277",
+            "retrieved_label": "lifting something up completely, then letting it drop down",
+            "retrieved_video_id": "125822",
+            "target_label": "showing something to the camera",
+            "target_rank": 12,
+            "target_video_id": "163277",
+            "text_query": "showing banana bunch to the camera",
+            "top_video_ids": [
+              "125822",
+              "90365",
+              "124985",
+              "183171",
+              "126691",
+              "154517",
+              "117581",
+              "10473",
+              "196408",
+              "84982"
+            ]
+          }
+        ],
+        "wrong_temporal_direction": [
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "clip_baseline",
+            "query_id": "test_8564",
+            "retrieved_label": "opening something",
+            "retrieved_video_id": "97509",
+            "target_label": "closing something",
+            "target_rank": 9954,
+            "target_video_id": "8564",
+            "text_query": "closing file",
+            "top_video_ids": [
+              "97509",
+              "89805",
+              "31850",
+              "41274",
+              "118743",
+              "15966",
+              "32433",
+              "157001",
+              "86412",
+              "69819"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "clip_baseline",
+            "query_id": "test_129246",
+            "retrieved_label": "covering something with something",
+            "retrieved_video_id": "20649",
+            "target_label": "uncovering something",
+            "target_rank": 162,
+            "target_video_id": "129246",
+            "text_query": "uncovering tool",
+            "top_video_ids": [
+              "20649",
+              "42849",
+              "164131",
+              "17657",
+              "150634",
+              "69499",
+              "177747",
+              "18620",
+              "21575",
+              "123037"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "clip_baseline",
+            "query_id": "test_154077",
+            "retrieved_label": "putting something similar to other things that are already on the table",
+            "retrieved_video_id": "204776",
+            "target_label": "taking one of many similar things on the table",
+            "target_rank": 75,
+            "target_video_id": "154077",
+            "text_query": "taking one coin",
+            "top_video_ids": [
+              "204776",
+              "14208",
+              "104108",
+              "29152",
+              "22486",
+              "189691",
+              "107239",
+              "185757",
+              "44330",
+              "122623"
+            ]
+          }
+        ]
+      },
+      "num_errors": 11892
+    },
+    "two_stage_token_reranker": {
+      "counts": {
+        "correct_objects_wrong_action": 1546,
+        "encoder_failure": 5,
+        "similar_start_end_different_motion": 60,
+        "text_ambiguity": 669,
+        "visual_ambiguity": 8565,
+        "wrong_action_ordering": 0,
+        "wrong_temporal_direction": 175
+      },
+      "examples": {
+        "correct_objects_wrong_action": [
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_136463",
+            "retrieved_label": "showing that something is empty",
+            "retrieved_video_id": "55735",
+            "target_label": "pretending to turn something upside down",
+            "target_rank": 2,
+            "target_video_id": "136463",
+            "text_query": "pretending to turn plastic cup upside down",
+            "top_video_ids": [
+              "55735",
+              "136463",
+              "52129",
+              "172486",
+              "196784",
+              "66594",
+              "81442",
+              "16017",
+              "93859",
+              "215016"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_201017",
+            "retrieved_label": "unfolding something",
+            "retrieved_video_id": "84570",
+            "target_label": "covering something with something",
+            "target_rank": 25,
+            "target_video_id": "201017",
+            "text_query": "covering a cleansing pad with a paper",
+            "top_video_ids": [
+              "84570",
+              "102422",
+              "211224",
+              "203717",
+              "218395",
+              "175876",
+              "176845",
+              "53038",
+              "59120",
+              "179922"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_24002",
+            "retrieved_label": "something being deflected from something",
+            "retrieved_video_id": "85116",
+            "target_label": "tilting something with something on it until it falls off",
+            "target_rank": 2,
+            "target_video_id": "24002",
+            "text_query": "tilting can with ball on it until it falls off",
+            "top_video_ids": [
+              "85116",
+              "24002",
+              "104742",
+              "58186",
+              "115579",
+              "16981",
+              "73083",
+              "8244",
+              "77274",
+              "151290"
+            ]
+          }
+        ],
+        "encoder_failure": [
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_183310",
+            "retrieved_label": "attaching something to something",
+            "retrieved_video_id": "207570",
+            "target_label": "attaching something to something",
+            "target_rank": 7493,
+            "target_video_id": "183310",
+            "text_query": "attaching a paper to a paper",
+            "top_video_ids": [
+              "207570",
+              "206900",
+              "102432",
+              "212129",
+              "34291",
+              "125551",
+              "170730",
+              "94935",
+              "83119",
+              "39883"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_209302",
+            "retrieved_label": "pushing something onto something",
+            "retrieved_video_id": "62250",
+            "target_label": "poking a hole into some substance",
+            "target_rank": 6296,
+            "target_video_id": "209302",
+            "text_query": "poking a hole into box",
+            "top_video_ids": [
+              "62250",
+              "154348",
+              "53018",
+              "10071",
+              "157374",
+              "193142",
+              "71027",
+              "123552",
+              "73450",
+              "212599"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_36227",
+            "retrieved_label": "showing that something is inside something",
+            "retrieved_video_id": "208537",
+            "target_label": "showing something behind something",
+            "target_rank": 7619,
+            "target_video_id": "36227",
+            "text_query": "showing spectacle box behind yellow clay box",
+            "top_video_ids": [
+              "208537",
+              "71504",
+              "203660",
+              "205766",
+              "165513",
+              "170404",
+              "46475",
+              "203783",
+              "3274",
+              "80449"
+            ]
+          }
+        ],
+        "similar_start_end_different_motion": [
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_64506",
+            "retrieved_label": "pretending to take something from somewhere",
+            "retrieved_video_id": "203640",
+            "target_label": "taking one of many similar things on the table",
+            "target_rank": 23,
+            "target_video_id": "64506",
+            "text_query": "taking yellow highlighter",
+            "top_video_ids": [
+              "203640",
+              "77214",
+              "64006",
+              "37029",
+              "167326",
+              "185208",
+              "85848",
+              "159995",
+              "198902",
+              "12895"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_136303",
+            "retrieved_label": "squeezing something",
+            "retrieved_video_id": "217471",
+            "target_label": "pretending to squeeze something",
+            "target_rank": 29,
+            "target_video_id": "136303",
+            "text_query": "pretending to squeeze a wooden toy",
+            "top_video_ids": [
+              "217471",
+              "133337",
+              "138850",
+              "26630",
+              "152731",
+              "214754",
+              "87826",
+              "76453",
+              "134546",
+              "163952"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_192226",
+            "retrieved_label": "pretending to put something underneath something",
+            "retrieved_video_id": "76926",
+            "target_label": "putting something underneath something",
+            "target_rank": 268,
+            "target_video_id": "192226",
+            "text_query": "putting book underneath mobile",
+            "top_video_ids": [
+              "76926",
+              "164849",
+              "216578",
+              "211461",
+              "142509",
+              "118742",
+              "125787",
+              "109618",
+              "26984",
+              "180948"
+            ]
+          }
+        ],
+        "text_ambiguity": [
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_188239",
+            "retrieved_label": "pulling something from left to right",
+            "retrieved_video_id": "6848",
+            "target_label": "pulling something from left to right",
+            "target_rank": 28,
+            "target_video_id": "188239",
+            "text_query": "pulling mobile phone from left to right",
+            "top_video_ids": [
+              "6848",
+              "134377",
+              "167711",
+              "84967",
+              "116035",
+              "58865",
+              "90357",
+              "14056",
+              "215308",
+              "96417"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_154560",
+            "retrieved_label": "taking one of many similar things on the table",
+            "retrieved_video_id": "184270",
+            "target_label": "taking one of many similar things on the table",
+            "target_rank": 2,
+            "target_video_id": "154560",
+            "text_query": "taking paper",
+            "top_video_ids": [
+              "184270",
+              "154560",
+              "162861",
+              "163960",
+              "210275",
+              "157675",
+              "75918",
+              "111996",
+              "159433",
+              "39175"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_59128",
+            "retrieved_label": "plugging something into something",
+            "retrieved_video_id": "76986",
+            "target_label": "plugging something into something",
+            "target_rank": 58,
+            "target_video_id": "59128",
+            "text_query": "plugging a charger into the wall",
+            "top_video_ids": [
+              "76986",
+              "201325",
+              "131838",
+              "18441",
+              "45058",
+              "64480",
+              "196867",
+              "209791",
+              "3109",
+              "202558"
+            ]
+          }
+        ],
+        "visual_ambiguity": [
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_194702",
+            "retrieved_label": "sprinkling something onto something",
+            "retrieved_video_id": "13962",
+            "target_label": "sprinkling something onto something",
+            "target_rank": 101,
+            "target_video_id": "194702",
+            "text_query": "sprinkling water onto a mirror",
+            "top_video_ids": [
+              "13962",
+              "23780",
+              "188950",
+              "114878",
+              "87038",
+              "188377",
+              "193767",
+              "207166",
+              "177364",
+              "91030"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_185895",
+            "retrieved_label": "pulling two ends of something but nothing happens",
+            "retrieved_video_id": "104030",
+            "target_label": "folding something",
+            "target_rank": 63,
+            "target_video_id": "185895",
+            "text_query": "folding sun glasses",
+            "top_video_ids": [
+              "104030",
+              "192722",
+              "38828",
+              "115382",
+              "4208",
+              "6774",
+              "32201",
+              "203082",
+              "112465",
+              "112815"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_163711",
+            "retrieved_label": "turning the camera right while filming something",
+            "retrieved_video_id": "31914",
+            "target_label": "turning the camera right while filming something",
+            "target_rank": 54,
+            "target_video_id": "163711",
+            "text_query": "turning the camera right while filming board",
+            "top_video_ids": [
+              "31914",
+              "128777",
+              "171973",
+              "206332",
+              "210710",
+              "130060",
+              "8800",
+              "901",
+              "115108",
+              "175464"
+            ]
+          }
+        ],
+        "wrong_temporal_direction": [
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_129654",
+            "retrieved_label": "pulling something from right to left",
+            "retrieved_video_id": "197574",
+            "target_label": "pulling something from left to right",
+            "target_rank": 21,
+            "target_video_id": "129654",
+            "text_query": "pulling a box from left to right",
+            "top_video_ids": [
+              "197574",
+              "174279",
+              "143051",
+              "163169",
+              "215308",
+              "166205",
+              "158936",
+              "109307",
+              "25335",
+              "53049"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_99206",
+            "retrieved_label": "moving something up",
+            "retrieved_video_id": "183008",
+            "target_label": "moving something down",
+            "target_rank": 11,
+            "target_video_id": "99206",
+            "text_query": "moving glasses down",
+            "top_video_ids": [
+              "183008",
+              "86983",
+              "123068",
+              "37052",
+              "95559",
+              "12679",
+              "112815",
+              "87192",
+              "185895",
+              "217520"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker",
+            "query_id": "test_116035",
+            "retrieved_label": "pushing something from right to left",
+            "retrieved_video_id": "167119",
+            "target_label": "pulling something from right to left",
+            "target_rank": 33,
+            "target_video_id": "116035",
+            "text_query": "pulling duster from right to left",
+            "top_video_ids": [
+              "167119",
+              "217858",
+              "183535",
+              "174599",
+              "81577",
+              "72216",
+              "93619",
+              "39277",
+              "130719",
+              "154512"
+            ]
+          }
+        ]
+      },
+      "num_errors": 11020
+    },
+    "two_stage_token_reranker_state_only": {
+      "counts": {
+        "correct_objects_wrong_action": 1617,
+        "encoder_failure": 7,
+        "similar_start_end_different_motion": 83,
+        "text_ambiguity": 692,
+        "visual_ambiguity": 8395,
+        "wrong_action_ordering": 0,
+        "wrong_temporal_direction": 225
+      },
+      "examples": {
+        "correct_objects_wrong_action": [
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_180111",
+            "retrieved_label": "holding something",
+            "retrieved_video_id": "34916",
+            "target_label": "pretending or trying and failing to twist something",
+            "target_rank": 64,
+            "target_video_id": "180111",
+            "text_query": "pretending or trying and failing to twist remote",
+            "top_video_ids": [
+              "34916",
+              "66068",
+              "202728",
+              "161435",
+              "37745",
+              "177728",
+              "155489",
+              "135432",
+              "139048",
+              "176548"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_136463",
+            "retrieved_label": "showing that something is empty",
+            "retrieved_video_id": "55735",
+            "target_label": "pretending to turn something upside down",
+            "target_rank": 5,
+            "target_video_id": "136463",
+            "text_query": "pretending to turn plastic cup upside down",
+            "top_video_ids": [
+              "55735",
+              "66594",
+              "16017",
+              "127152",
+              "136463",
+              "183880",
+              "168986",
+              "52129",
+              "122529",
+              "40794"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_24002",
+            "retrieved_label": "something being deflected from something",
+            "retrieved_video_id": "85116",
+            "target_label": "tilting something with something on it until it falls off",
+            "target_rank": 12,
+            "target_video_id": "24002",
+            "text_query": "tilting can with ball on it until it falls off",
+            "top_video_ids": [
+              "85116",
+              "133200",
+              "104742",
+              "131591",
+              "16981",
+              "115579",
+              "157182",
+              "164265",
+              "152539",
+              "35870"
+            ]
+          }
+        ],
+        "encoder_failure": [
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_21655",
+            "retrieved_label": "stuffing something into something",
+            "retrieved_video_id": "185471",
+            "target_label": "stuffing something into something",
+            "target_rank": 7500,
+            "target_video_id": "21655",
+            "text_query": "stuffing something into something",
+            "top_video_ids": [
+              "185471",
+              "208509",
+              "75469",
+              "92373",
+              "63145",
+              "55263",
+              "207083",
+              "132839",
+              "33671",
+              "73057"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_11131",
+            "retrieved_label": "laying something on the table on its side, not upright",
+            "retrieved_video_id": "142226",
+            "target_label": "moving something up",
+            "target_rank": 6340,
+            "target_video_id": "11131",
+            "text_query": "moving ashtray up",
+            "top_video_ids": [
+              "142226",
+              "192731",
+              "123926",
+              "166637",
+              "55254",
+              "167013",
+              "208019",
+              "81608",
+              "120443",
+              "75719"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_163636",
+            "retrieved_label": "lifting up one end of something, then letting it drop down",
+            "retrieved_video_id": "149795",
+            "target_label": "lifting up one end of something, then letting it drop down",
+            "target_rank": 7042,
+            "target_video_id": "163636",
+            "text_query": "lifting up one end of something, then letting it drop down",
+            "top_video_ids": [
+              "149795",
+              "28396",
+              "66573",
+              "30072",
+              "71100",
+              "12340",
+              "15990",
+              "60020",
+              "177779",
+              "213842"
+            ]
+          }
+        ],
+        "similar_start_end_different_motion": [
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_64138",
+            "retrieved_label": "putting number of something onto something",
+            "retrieved_video_id": "180885",
+            "target_label": "pretending to put something onto something",
+            "target_rank": 3,
+            "target_video_id": "64138",
+            "text_query": "pretending to put scissors onto book",
+            "top_video_ids": [
+              "180885",
+              "181152",
+              "64138",
+              "57112",
+              "62253",
+              "190494",
+              "41462",
+              "69683",
+              "115409",
+              "41321"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_201999",
+            "retrieved_label": "putting something behind something",
+            "retrieved_video_id": "55035",
+            "target_label": "pretending to put something behind something",
+            "target_rank": 2,
+            "target_video_id": "201999",
+            "text_query": "pretending to put book behind bottle",
+            "top_video_ids": [
+              "55035",
+              "201999",
+              "215988",
+              "45788",
+              "97607",
+              "103655",
+              "91923",
+              "15770",
+              "131817",
+              "140426"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_136303",
+            "retrieved_label": "squeezing something",
+            "retrieved_video_id": "152731",
+            "target_label": "pretending to squeeze something",
+            "target_rank": 15,
+            "target_video_id": "136303",
+            "text_query": "pretending to squeeze a wooden toy",
+            "top_video_ids": [
+              "152731",
+              "133337",
+              "108867",
+              "214754",
+              "182726",
+              "217471",
+              "138850",
+              "88132",
+              "1733",
+              "172962"
+            ]
+          }
+        ],
+        "text_ambiguity": [
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_2199",
+            "retrieved_label": "poking something so it slightly moves",
+            "retrieved_video_id": "26051",
+            "target_label": "poking something so it slightly moves",
+            "target_rank": 2,
+            "target_video_id": "2199",
+            "text_query": "poking bottle so it slightly moves",
+            "top_video_ids": [
+              "26051",
+              "2199",
+              "147122",
+              "177251",
+              "53872",
+              "205741",
+              "25632",
+              "23275",
+              "57897",
+              "36265"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_180965",
+            "retrieved_label": "holding something",
+            "retrieved_video_id": "128516",
+            "target_label": "holding something",
+            "target_rank": 14,
+            "target_video_id": "180965",
+            "text_query": "holding cup",
+            "top_video_ids": [
+              "128516",
+              "195337",
+              "7064",
+              "79888",
+              "71728",
+              "98466",
+              "107888",
+              "86373",
+              "88339",
+              "39213"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_13441",
+            "retrieved_label": "showing that something is empty",
+            "retrieved_video_id": "26612",
+            "target_label": "showing that something is empty",
+            "target_rank": 87,
+            "target_video_id": "13441",
+            "text_query": "showing that a cup is empty",
+            "top_video_ids": [
+              "26612",
+              "3933",
+              "3043",
+              "192192",
+              "43126",
+              "67358",
+              "22704",
+              "40007",
+              "184906",
+              "77892"
+            ]
+          }
+        ],
+        "visual_ambiguity": [
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_194702",
+            "retrieved_label": "sprinkling something onto something",
+            "retrieved_video_id": "188950",
+            "target_label": "sprinkling something onto something",
+            "target_rank": 9,
+            "target_video_id": "194702",
+            "text_query": "sprinkling water onto a mirror",
+            "top_video_ids": [
+              "188950",
+              "95249",
+              "81792",
+              "13962",
+              "214435",
+              "177364",
+              "89133",
+              "202832",
+              "194702",
+              "147975"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_185895",
+            "retrieved_label": "pulling two ends of something but nothing happens",
+            "retrieved_video_id": "104030",
+            "target_label": "folding something",
+            "target_rank": 131,
+            "target_video_id": "185895",
+            "text_query": "folding sun glasses",
+            "top_video_ids": [
+              "104030",
+              "38828",
+              "112815",
+              "1800",
+              "192722",
+              "205120",
+              "161120",
+              "172617",
+              "40879",
+              "65550"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_188239",
+            "retrieved_label": "pulling something from left to right",
+            "retrieved_video_id": "58865",
+            "target_label": "pulling something from left to right",
+            "target_rank": 22,
+            "target_video_id": "188239",
+            "text_query": "pulling mobile phone from left to right",
+            "top_video_ids": [
+              "58865",
+              "84967",
+              "167711",
+              "6551",
+              "90357",
+              "6848",
+              "98301",
+              "99838",
+              "98603",
+              "134377"
+            ]
+          }
+        ],
+        "wrong_temporal_direction": [
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_195222",
+            "retrieved_label": "folding something",
+            "retrieved_video_id": "122772",
+            "target_label": "unfolding something",
+            "target_rank": 264,
+            "target_video_id": "195222",
+            "text_query": "unfolding a plastic bag",
+            "top_video_ids": [
+              "122772",
+              "162311",
+              "81358",
+              "197634",
+              "105854",
+              "153598",
+              "190268",
+              "182072",
+              "149192",
+              "211034"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_99206",
+            "retrieved_label": "moving something up",
+            "retrieved_video_id": "183008",
+            "target_label": "moving something down",
+            "target_rank": 3,
+            "target_video_id": "99206",
+            "text_query": "moving glasses down",
+            "top_video_ids": [
+              "183008",
+              "123068",
+              "99206",
+              "159544",
+              "37052",
+              "84008",
+              "87192",
+              "12679",
+              "142226",
+              "95559"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "two_stage_token_reranker_state_only",
+            "query_id": "test_37520",
+            "retrieved_label": "moving something down",
+            "retrieved_video_id": "112358",
+            "target_label": "moving something up",
+            "target_rank": 5,
+            "target_video_id": "37520",
+            "text_query": "moving mouse up",
+            "top_video_ids": [
+              "112358",
+              "28140",
+              "54445",
+              "82611",
+              "37520",
+              "8746",
+              "881",
+              "24411",
+              "160623",
+              "104739"
+            ]
+          }
+        ]
+      },
+      "num_errors": 11019
+    },
+    "vjepa_baseline": {
+      "counts": {
+        "correct_objects_wrong_action": 1847,
+        "encoder_failure": 18,
+        "similar_start_end_different_motion": 115,
+        "text_ambiguity": 473,
+        "visual_ambiguity": 8367,
+        "wrong_action_ordering": 0,
+        "wrong_temporal_direction": 412
+      },
+      "examples": {
+        "correct_objects_wrong_action": [
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_194702",
+            "retrieved_label": "something colliding with something and both are being deflected",
+            "retrieved_video_id": "95249",
+            "target_label": "sprinkling something onto something",
+            "target_rank": 54,
+            "target_video_id": "194702",
+            "text_query": "sprinkling water onto a mirror",
+            "top_video_ids": [
+              "95249",
+              "81792",
+              "214435",
+              "188950",
+              "94830",
+              "202832",
+              "89883",
+              "1265",
+              "57471",
+              "177364"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_99206",
+            "retrieved_label": "lifting something up completely without letting it drop down",
+            "retrieved_video_id": "38828",
+            "target_label": "moving something down",
+            "target_rank": 10,
+            "target_video_id": "99206",
+            "text_query": "moving glasses down",
+            "top_video_ids": [
+              "38828",
+              "86983",
+              "172617",
+              "84008",
+              "207785",
+              "217520",
+              "183008",
+              "37052",
+              "95559",
+              "99206"
+            ]
+          },
+          {
+            "category": "correct_objects_wrong_action",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_2199",
+            "retrieved_label": "pushing something with something",
+            "retrieved_video_id": "147122",
+            "target_label": "poking something so it slightly moves",
+            "target_rank": 3,
+            "target_video_id": "2199",
+            "text_query": "poking bottle so it slightly moves",
+            "top_video_ids": [
+              "147122",
+              "52646",
+              "2199",
+              "25632",
+              "53872",
+              "37541",
+              "175006",
+              "144295",
+              "15415",
+              "95317"
+            ]
+          }
+        ],
+        "encoder_failure": [
+          {
+            "category": "encoder_failure",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_163636",
+            "retrieved_label": "lifting up one end of something, then letting it drop down",
+            "retrieved_video_id": "149795",
+            "target_label": "lifting up one end of something, then letting it drop down",
+            "target_rank": 7333,
+            "target_video_id": "163636",
+            "text_query": "lifting up one end of something, then letting it drop down",
+            "top_video_ids": [
+              "149795",
+              "66573",
+              "8159",
+              "199236",
+              "15990",
+              "29334",
+              "31892",
+              "95374",
+              "209112",
+              "111033"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_98789",
+            "retrieved_label": "pushing something with something",
+            "retrieved_video_id": "174005",
+            "target_label": "pushing something with something",
+            "target_rank": 6788,
+            "target_video_id": "98789",
+            "text_query": "pushing paint with phone",
+            "top_video_ids": [
+              "174005",
+              "43796",
+              "104517",
+              "101721",
+              "79793",
+              "5687",
+              "210319",
+              "195830",
+              "4943",
+              "104635"
+            ]
+          },
+          {
+            "category": "encoder_failure",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_100279",
+            "retrieved_label": "opening something",
+            "retrieved_video_id": "105526",
+            "target_label": "opening something",
+            "target_rank": 10952,
+            "target_video_id": "100279",
+            "text_query": "opening drawer",
+            "top_video_ids": [
+              "105526",
+              "91755",
+              "121183",
+              "18604",
+              "180327",
+              "12121",
+              "183179",
+              "6175",
+              "19832",
+              "1602"
+            ]
+          }
+        ],
+        "similar_start_end_different_motion": [
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_207648",
+            "retrieved_label": "pretending to put something into something",
+            "retrieved_video_id": "143630",
+            "target_label": "putting something into something",
+            "target_rank": 245,
+            "target_video_id": "207648",
+            "text_query": "putting battery into mug",
+            "top_video_ids": [
+              "143630",
+              "139854",
+              "8007",
+              "3866",
+              "199475",
+              "2645",
+              "108836",
+              "218831",
+              "92079",
+              "75763"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_136463",
+            "retrieved_label": "turning something upside down",
+            "retrieved_video_id": "52129",
+            "target_label": "pretending to turn something upside down",
+            "target_rank": 10,
+            "target_video_id": "136463",
+            "text_query": "pretending to turn plastic cup upside down",
+            "top_video_ids": [
+              "52129",
+              "55735",
+              "127152",
+              "66594",
+              "16017",
+              "18596",
+              "128360",
+              "98700",
+              "168986",
+              "136463"
+            ]
+          },
+          {
+            "category": "similar_start_end_different_motion",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_64138",
+            "retrieved_label": "putting number of something onto something",
+            "retrieved_video_id": "180885",
+            "target_label": "pretending to put something onto something",
+            "target_rank": 3,
+            "target_video_id": "64138",
+            "text_query": "pretending to put scissors onto book",
+            "top_video_ids": [
+              "180885",
+              "183206",
+              "64138",
+              "181152",
+              "69683",
+              "82004",
+              "207156",
+              "9317",
+              "21378",
+              "161627"
+            ]
+          }
+        ],
+        "text_ambiguity": [
+          {
+            "category": "text_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_40838",
+            "retrieved_label": "turning something upside down",
+            "retrieved_video_id": "148378",
+            "target_label": "turning something upside down",
+            "target_rank": 2,
+            "target_video_id": "40838",
+            "text_query": "turning a box upside down",
+            "top_video_ids": [
+              "148378",
+              "40838",
+              "146990",
+              "29304",
+              "101885",
+              "14041",
+              "130116",
+              "20943",
+              "26734",
+              "92412"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_62503",
+            "retrieved_label": "turning something upside down",
+            "retrieved_video_id": "23835",
+            "target_label": "turning something upside down",
+            "target_rank": 31,
+            "target_video_id": "62503",
+            "text_query": "turning bottle upside down",
+            "top_video_ids": [
+              "23835",
+              "118694",
+              "187685",
+              "44850",
+              "86882",
+              "108589",
+              "216042",
+              "188732",
+              "156566",
+              "14914"
+            ]
+          },
+          {
+            "category": "text_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_213305",
+            "retrieved_label": "opening something",
+            "retrieved_video_id": "191418",
+            "target_label": "opening something",
+            "target_rank": 5,
+            "target_video_id": "213305",
+            "text_query": "opening purse",
+            "top_video_ids": [
+              "191418",
+              "141429",
+              "5435",
+              "88347",
+              "213305",
+              "220213",
+              "115382",
+              "148145",
+              "27779",
+              "59764"
+            ]
+          }
+        ],
+        "visual_ambiguity": [
+          {
+            "category": "visual_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_185895",
+            "retrieved_label": "pretending to turn something upside down",
+            "retrieved_video_id": "161120",
+            "target_label": "folding something",
+            "target_rank": 12,
+            "target_video_id": "185895",
+            "text_query": "folding sun glasses",
+            "top_video_ids": [
+              "161120",
+              "104030",
+              "88569",
+              "172617",
+              "4208",
+              "65550",
+              "6747",
+              "42088",
+              "38828",
+              "71540"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_163711",
+            "retrieved_label": "turning the camera right while filming something",
+            "retrieved_video_id": "128777",
+            "target_label": "turning the camera right while filming something",
+            "target_rank": 17,
+            "target_video_id": "163711",
+            "text_query": "turning the camera right while filming board",
+            "top_video_ids": [
+              "128777",
+              "92857",
+              "171973",
+              "31914",
+              "130060",
+              "67793",
+              "13269",
+              "183482",
+              "116978",
+              "187138"
+            ]
+          },
+          {
+            "category": "visual_ambiguity",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_163277",
+            "retrieved_label": "showing a photo of something to the camera",
+            "retrieved_video_id": "36710",
+            "target_label": "showing something to the camera",
+            "target_rank": 24,
+            "target_video_id": "163277",
+            "text_query": "showing banana bunch to the camera",
+            "top_video_ids": [
+              "36710",
+              "84982",
+              "121394",
+              "206508",
+              "177181",
+              "71345",
+              "190157",
+              "45416",
+              "103182",
+              "32563"
+            ]
+          }
+        ],
+        "wrong_temporal_direction": [
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_188239",
+            "retrieved_label": "pulling something from right to left",
+            "retrieved_video_id": "167711",
+            "target_label": "pulling something from left to right",
+            "target_rank": 8,
+            "target_video_id": "188239",
+            "text_query": "pulling mobile phone from left to right",
+            "top_video_ids": [
+              "167711",
+              "215308",
+              "6551",
+              "163441",
+              "90357",
+              "84967",
+              "58865",
+              "188239",
+              "77092",
+              "26928"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_100339",
+            "retrieved_label": "unfolding something",
+            "retrieved_video_id": "6253",
+            "target_label": "folding something",
+            "target_rank": 214,
+            "target_video_id": "100339",
+            "text_query": "folding business card",
+            "top_video_ids": [
+              "6253",
+              "178202",
+              "131362",
+              "168777",
+              "8956",
+              "9900",
+              "200847",
+              "4931",
+              "136438",
+              "141659"
+            ]
+          },
+          {
+            "category": "wrong_temporal_direction",
+            "model_name": "vjepa_baseline",
+            "query_id": "test_195222",
+            "retrieved_label": "folding something",
+            "retrieved_video_id": "122772",
+            "target_label": "unfolding something",
+            "target_rank": 30,
+            "target_video_id": "195222",
+            "text_query": "unfolding a plastic bag",
+            "top_video_ids": [
+              "122772",
+              "50765",
+              "134048",
+              "213741",
+              "89877",
+              "99776",
+              "150380",
+              "55360",
+              "25820",
+              "203254"
+            ]
+          }
+        ]
+      },
+      "num_errors": 11232
+    }
+  }
+}

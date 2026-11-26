@@ -1,0 +1,102 @@
+job=7692 task=5 host=farsight gpus=4
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T23:16:51-06:00
+variant=final_minus_initial
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_final_minus_initial_seed42_best.pt (pass --retrain to train again)
+{
+  "ablation_final_minus_initial_seed42_reversed": {
+    "full": {
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0001017516988213174,
+      "map": 0.0001017516988213174,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.014367584147227379,
+      "recall@5": 0.15981919444668657,
+      "recall@10": 1.0,
+      "mrr": 0.15390558540821075,
+      "map": 0.15390558540821075,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.021091484313208543,
+      "recall@5": 0.16187714210387555,
+      "recall@10": 1.0,
+      "mrr": 0.15665730834007263,
+      "map": 0.15665730834007263,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_final_minus_initial_seed42_reversed.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_final_minus_initial_seed43_best.pt (pass --retrain to train again)
+{
+  "ablation_final_minus_initial_seed43_reversed": {
+    "full": {
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.00010079055209644139,
+      "map": 0.00010079055209644139,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.014044717087739123,
+      "recall@5": 0.1535232867866656,
+      "recall@10": 1.0,
+      "mrr": 0.15231817960739136,
+      "map": 0.15231817960739136,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.021618771421038754,
+      "recall@5": 0.15660427102557342,
+      "recall@10": 1.0,
+      "mrr": 0.15645906329154968,
+      "map": 0.15645906329154968,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_final_minus_initial_seed43_reversed.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_final_minus_initial_seed44_best.pt (pass --retrain to train again)
+{
+  "ablation_final_minus_initial_seed44_reversed": {
+    "full": {
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.00010047856630990282,
+      "map": 0.00010047856630990282,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.012995399144402292,
+      "recall@5": 0.15513762208410686,
+      "recall@10": 1.0,
+      "mrr": 0.15146775543689728,
+      "map": 0.15146775543689728,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.018455048774057473,
+      "recall@5": 0.14974953862378065,
+      "recall@10": 1.0,
+      "mrr": 0.1536896675825119,
+      "map": 0.1536896675825119,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_final_minus_initial_seed44_reversed.json

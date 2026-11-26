@@ -393,10 +393,390 @@ def build_comparison_table(
     result_paths: list[Path],
     output_path: Path,
 ) -> Path:
-    """Create a CSV table comparing all model metrics."""
-    raise NotImplementedError("Comparison-table formatting will be added with result files.")
+    """Create a CSV comparison table from saved model evaluation results."""
 
+    import csv
+    from statistics import mean, stdev
 
+    if not result_paths:
+        raise ValueError("result_paths must not be empty")
+
+    metric_names = ("recall@1", "recall@5", "recall@10", "mrr", "map")
+    settings = ("full", "hard_negative", "action_contrast")
+    negative_types = ("opposite_action", "same_objects", "other_action")
+
+    runs_by_model = defaultdict(list)
+    signatures = {}
+
+    for path in result_paths:
+        path = Path(path)
+
+        with path.open("r", encoding="utf-8") as handle:
+            result = json.load(handle)
+
+        if not isinstance(result, dict) or not isinstance(result.get("full"), dict):
+            raise ValueError(f"Missing full retrieval results in {path}")
+
+        split = result.get("split")
+
+        if not split:
+            raise ValueError(f"Missing split name in {path}")
+
+        model = str(result.get("variant") or result.get("model_name") or path.stem)
+
+        if result.get("reverse_time") or path.stem.endswith("_reversed"):
+            model += "_reversed"
+
+        for setting in settings:
+            section = result.get(setting)
+
+            if section is None:
+                continue
+
+            if not isinstance(section, dict):
+                raise ValueError(f"Invalid {setting} results in {path}")
+
+            counts = (
+                split,
+                section.get("num_queries"),
+                section.get("num_candidates"),
+            )
+
+            if setting in signatures and signatures[setting] != counts:
+                raise ValueError(
+                    f"Different split or candidate counts for {setting}: {path}"
+                )
+
+            signatures.setdefault(setting, counts)
+
+        existing = runs_by_model[(model, split)]
+
+        if any(run.get("seed") == result.get("seed") for run in existing):
+            raise ValueError(f"Duplicate seed for {model}: {result.get('seed')}")
+
+        result["_per_query_path"] = path.with_name(
+            f"per_query_{path.stem}.jsonl"
+        )
+
+        existing.append(result)
+
+    columns = ["model", "split", "seeds", "num_runs"]
+
+    for setting in settings:
+        columns.append(f"{setting}_num_queries")
+
+        for metric in metric_names:
+            columns.extend([
+                f"{setting}_{metric}_mean",
+                f"{setting}_{metric}_std",
+            ])
+
+    for kind in negative_types:
+        for metric in ("recall@1", "mrr", "pairwise_accuracy"):
+            columns.extend([
+                f"hard_negative_{kind}_{metric}_mean",
+                f"hard_negative_{kind}_{metric}_std",
+            ])
+
+    columns.extend([
+        "action_contrast_opposite_action_pairwise_accuracy_mean",
+        "action_contrast_opposite_action_pairwise_accuracy_std",
+    ])
+
+    def summary(runs, setting, metric, kind=None):
+        numbers = []
+
+        for run in runs:
+            section = run.get(setting)
+
+            if kind is not None and isinstance(section, dict):
+                section = section.get("by_negative_type", {}).get(kind)
+
+            value = section.get(metric) if isinstance(section, dict) else None
+
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                return "N/A", "N/A"
+
+            numbers.append(float(value))
+
+        average = round(mean(numbers), 6)
+
+        standard_deviation = (
+            round(stdev(numbers), 6) if len(numbers) > 1 else "N/A"
+        )
+
+        return average, standard_deviation
+
+    rows = []
+
+    for (model, split), runs in sorted(runs_by_model.items()):
+        seed_names = sorted(
+            str(run["seed"])
+            for run in runs
+            if run.get("seed") is not None
+        )
+
+        row = {
+            "model": model,
+            "split": split,
+            "seeds": ",".join(seed_names) if seed_names else "N/A",
+            "num_runs": len(runs),
+        }
+
+        for setting in settings:
+            section = next(
+                (
+                    run.get(setting)
+                    for run in runs
+                    if isinstance(run.get(setting), dict)
+                ),
+                None,
+            )
+
+            row[f"{setting}_num_queries"] = (
+                section.get("num_queries", "N/A") if section else "N/A"
+            )
+
+            for metric in metric_names:
+                avg, std = summary(runs, setting, metric)
+
+                row[f"{setting}_{metric}_mean"] = avg
+                row[f"{setting}_{metric}_std"] = std
+
+        for kind in negative_types:
+            for metric in ("recall@1", "mrr", "pairwise_accuracy"):
+                avg, std = summary(runs, "hard_negative", metric, kind)
+
+                row[f"hard_negative_{kind}_{metric}_mean"] = avg
+                row[f"hard_negative_{kind}_{metric}_std"] = std
+
+        avg, std = summary(
+            runs,
+            "action_contrast",
+            "pairwise_accuracy",
+            "opposite_action",
+        )
+
+        row["action_contrast_opposite_action_pairwise_accuracy_mean"] = avg
+        row["action_contrast_opposite_action_pairwise_accuracy_std"] = std
+
+        rows.append(row)
+
+    comparison_columns = [
+        f"e2_minus_e1_{setting}_recall@1_pp_seed{seed}"
+        for setting in settings
+        for seed in (42, 43, 44)
+    ]
+
+    bootstrap_columns = [
+        f"e2_minus_e1_action_contrast_recall@1_ci_{bound}_pp_seed{seed}"
+        for seed in (42, 43, 44)
+        for bound in ("low", "high")
+    ]
+
+    bootstrap_columns.extend([
+        f"e2_minus_e1_action_contrast_num_queries_seed{seed}"
+        for seed in (42, 43, 44)
+    ])
+
+    columns.extend(comparison_columns + bootstrap_columns)
+
+    for row in rows:
+        for column in comparison_columns + bootstrap_columns:
+            row[column] = "N/A"
+
+    e2_name = "two_stage_token_reranker"
+    e1_name = "two_stage_token_reranker_state_only"
+
+    for (model, split), e2_runs in runs_by_model.items():
+        if model != e2_name:
+            continue
+
+        e1_runs = runs_by_model.get((e1_name, split))
+
+        if not e1_runs:
+            continue
+
+        e2_by_seed = {
+            str(run["seed"]): run
+            for run in e2_runs
+            if run.get("seed") is not None
+        }
+
+        e1_by_seed = {
+            str(run["seed"]): run
+            for run in e1_runs
+            if run.get("seed") is not None
+        }
+
+        e2_row = next(
+            row for row in rows
+            if row["model"] == e2_name and row["split"] == split
+        )
+
+        for setting in settings:
+            for seed in (42, 43, 44):
+                e2_run = e2_by_seed.get(str(seed))
+                e1_run = e1_by_seed.get(str(seed))
+
+                if e2_run is None or e1_run is None:
+                    continue
+
+                e2_metrics = e2_run.get(setting)
+                e1_metrics = e1_run.get(setting)
+
+                if not isinstance(e2_metrics, dict) or not isinstance(e1_metrics, dict):
+                    continue
+
+                e2_value = e2_metrics.get("recall@1")
+                e1_value = e1_metrics.get("recall@1")
+
+                if not isinstance(e2_value, (int, float)):
+                    continue
+
+                if not isinstance(e1_value, (int, float)):
+                    continue
+
+                difference_pp = 100 * (e2_value - e1_value)
+
+                column = f"e2_minus_e1_{setting}_recall@1_pp_seed{seed}"
+
+                e2_row[column] = round(difference_pp, 3)
+                if setting == "action_contrast":
+                    e1_path = e1_run["_per_query_path"]
+                    e2_path = e2_run["_per_query_path"]
+
+                    if e1_path.is_file() and e2_path.is_file():
+                        with e1_path.open("r", encoding="utf-8") as file:
+                            e1_rows = [
+                                json.loads(line)
+                                for line in file
+                                if line.strip()
+                            ]
+
+                        with e2_path.open("r", encoding="utf-8") as file:
+                            e2_rows = [
+                                json.loads(line)
+                                for line in file
+                                if line.strip()
+                            ]
+
+                        ci = paired_bootstrap_recall_at_1(
+                            e1_rows,
+                            e2_rows,
+                            rank_key="action_contrast_rank",
+                            n_bootstrap=10000,
+                            seed=42,
+                        )
+
+                        prefix = (
+                            "e2_minus_e1_action_contrast_recall@1_ci"
+                        )
+
+                        e2_row[f"{prefix}_low_pp_seed{seed}"] = ci["ci_low_pp"]
+                        e2_row[f"{prefix}_high_pp_seed{seed}"] = ci["ci_high_pp"]
+
+                        e2_row[
+                            f"e2_minus_e1_action_contrast_num_queries_seed{seed}"
+                        ] = ci["num_queries"]
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with output_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return output_path
+def paired_bootstrap_recall_at_1(
+    e1_rows: list[dict],
+    e2_rows: list[dict],
+    rank_key: str = "action_contrast_rank",
+    n_bootstrap: int = 10000,
+    seed: int = 42,
+) -> dict:
+    """Calculate the paired-bootstrap 95% CI for E2 minus E1 Recall@1."""
+
+    if n_bootstrap < 1:
+        raise ValueError("n_bootstrap must be positive")
+
+    def get_ranks(rows):
+        ranks = {}
+
+        for row in rows:
+            query_id = str(row["query_id"])
+
+            if query_id in ranks:
+                raise ValueError(f"Duplicate query_id: {query_id}")
+
+            ranks[query_id] = row.get(rank_key)
+
+        return ranks
+
+    e1_ranks = get_ranks(e1_rows)
+    e2_ranks = get_ranks(e2_rows)
+
+    if e1_ranks.keys() != e2_ranks.keys():
+        raise ValueError("E1 and E2 must contain the same query IDs")
+
+    differences = []
+
+    for query_id in sorted(e1_ranks):
+        e1_rank = e1_ranks[query_id]
+        e2_rank = e2_ranks[query_id]
+
+        if e1_rank is None and e2_rank is None:
+            continue
+
+        if e1_rank is None or e2_rank is None:
+            raise ValueError(f"Missing matched rank for {query_id}")
+
+        if (
+            not isinstance(e1_rank, int)
+            or not isinstance(e2_rank, int)
+            or isinstance(e1_rank, bool)
+            or isinstance(e2_rank, bool)
+            or e1_rank < 1
+            or e2_rank < 1
+        ):
+            raise ValueError(f"Invalid rank for {query_id}")
+
+        e1_correct = int(e1_rank == 1)
+        e2_correct = int(e2_rank == 1)
+
+        differences.append(e2_correct - e1_correct)
+
+    if not differences:
+        raise ValueError("No valid paired queries found")
+
+    differences = np.asarray(differences, dtype=np.float64)
+
+    observed_difference = float(np.mean(differences))
+
+    rng = np.random.default_rng(seed)
+    bootstrap_differences = np.empty(n_bootstrap)
+
+    for i in range(n_bootstrap):
+        indices = rng.integers(
+            0,
+            len(differences),
+            size=len(differences),
+        )
+
+        bootstrap_differences[i] = np.mean(differences[indices])
+
+    ci_low, ci_high = np.percentile(
+        bootstrap_differences,
+        [2.5, 97.5],
+    )
+
+    return {
+        "difference_pp": round(100 * observed_difference, 4),
+        "ci_low_pp": round(100 * float(ci_low), 4),
+        "ci_high_pp": round(100 * float(ci_high), 4),
+        "num_queries": len(differences),
+        "n_bootstrap": n_bootstrap,
+    }
 def categorize_retrieval_errors(
     ranked_results: list[dict],
     annotations: dict[str, dict],
