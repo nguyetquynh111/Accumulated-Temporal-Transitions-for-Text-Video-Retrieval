@@ -1,0 +1,137 @@
+{
+  "action_contrast": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.8206906914710999,
+        "num_negatives": 34137,
+        "num_queries": 3793,
+        "pairwise_accuracy": 0.9222251515950435,
+        "recall@1": 0.7210651199578171
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 1.0
+      },
+      "negatives_by_type": {
+        "opposite_action": 34137
+      },
+      "num_negatives": 34137,
+      "num_queries": 3793,
+      "queries_with_opposite_action": 3793,
+      "queries_with_opposite_action_share": 1.0,
+      "queries_with_type": {
+        "opposite_action": 3793
+      }
+    },
+    "map": 0.8206906914710999,
+    "mrr": 0.8206906914710999,
+    "num_candidates": 10,
+    "num_queries": 3793,
+    "recall@1": 0.7210651199578171,
+    "recall@10": 1.0,
+    "recall@5": 0.9551805958344318
+  },
+  "action_contrast_file": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/data/annotations/action_contrast.jsonl",
+  "action_contrast_skipped": 0,
+  "annotations": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/data/annotations/test.jsonl",
+  "best_epoch": 15,
+  "checkpoint_epoch": 15,
+  "checkpoint_path": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/checkpoints/ablation_state_only_without_query_conditioning_seed42_best.pt",
+  "command": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/src/models/transition_model/pipelines/evaluate.py --run-name ablation_state_only_without_query_conditioning --seeds 42 --num-workers 7",
+  "epochs_run": 20,
+  "feature_dir": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/features/vjepa",
+  "full": {
+    "map": 0.1933775246143341,
+    "mrr": 0.1933775246143341,
+    "num_candidates": 12389,
+    "num_queries": 12389,
+    "recall@1": 0.1054160949229155,
+    "recall@10": 0.37016708370328516,
+    "recall@5": 0.2745984340947615
+  },
+  "hard_negative": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.8175573945045471,
+        "num_negatives": 5390,
+        "num_queries": 1688,
+        "pairwise_accuracy": 0.8116883116883117,
+        "recall@1": 0.6978672985781991
+      },
+      "other_action": {
+        "mrr": 0.9634644985198975,
+        "num_negatives": 27652,
+        "num_queries": 4085,
+        "pairwise_accuracy": 0.9854260089686099,
+        "recall@1": 0.9353733170134639
+      },
+      "same_objects": {
+        "mrr": 0.8669164776802063,
+        "num_negatives": 78459,
+        "num_queries": 10511,
+        "pairwise_accuracy": 0.9415745803540703,
+        "recall@1": 0.7788982970221673
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "num_negatives": 111501,
+      "num_queries": 12389,
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392,
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      }
+    },
+    "map": 0.8556129336357117,
+    "mrr": 0.8556129336357117,
+    "num_candidates": 10,
+    "num_queries": 12389,
+    "recall@1": 0.762531277746388,
+    "recall@10": 1.0,
+    "recall@5": 0.9787714908386472
+  },
+  "hard_negative_file": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/data/annotations/hard_negatives.jsonl",
+  "hard_negative_skipped": 0,
+  "model_config": {
+    "dropout": 0.1,
+    "model_dim": 256,
+    "num_heads": 4,
+    "num_layers": 2,
+    "query_conditioned": false,
+    "rerank_hidden_dim": 512,
+    "text_dim": 384,
+    "video_dim": 1024,
+    "video_input": "state_only"
+  },
+  "model_name": "ablation_state_only_without_query_conditioning",
+  "query_conditioned": false,
+  "seed": 42,
+  "skipped_missing_features": 0,
+  "split": "test",
+  "text_encoder": "minilm",
+  "text_model_name": "sentence-transformers/all-MiniLM-L6-v2",
+  "timestamp": "2026-11-15T18:45:59.414062+00:00",
+  "training_summary": {
+    "best_epoch": 15,
+    "best_score": 0.19119638204574585,
+    "epochs_run": 20,
+    "max_epochs": 50,
+    "patience": 5,
+    "reached_epoch_limit_while_improving": false,
+    "stopped_early": true
+  },
+  "video_input": "state_only"
+}

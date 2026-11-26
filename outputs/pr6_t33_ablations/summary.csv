@@ -1,0 +1,11 @@
+model,stem,seeds,full_R@1_mean,full_R@1_std,full_MRR_mean,hard_negative_R@1_mean,hard_negative_R@1_std,hard_negative_MRR_mean,action_contrast_R@1_mean,action_contrast_R@1_std,action_contrast_MRR_mean,reversed_seeds,reversed_action_contrast_R@1_mean,reversed_action_contrast_R@1_std,reversed_minus_normal_AC_R@1
+B2 pooled,vjepa_baseline,3,0.0929,0.0029,0.1746,0.7076,0.0041,0.8172,0.6109,0.0022,0.7428,0,,,
+no_transition,ablation_no_transition,3,0.0972,0.0017,0.1836,0.7557,0.0024,0.8507,0.7074,0.0072,0.8111,3,0.3895,0.0312,-0.3179
+transition_only,ablation_transition_only,3,0.0719,0.0029,0.1481,0.7411,0.0032,0.8410,0.7202,0.0045,0.8187,3,0.1070,0.0068,-0.6132
+shuffled_states,ablation_shuffled_states,3,0.0970,0.0009,0.1825,0.7431,0.0028,0.8427,0.6827,0.0042,0.7947,3,0.6824,0.0037,-0.0003
+mean_transition,ablation_mean_transition,3,0.0590,0.0024,0.1224,0.6687,0.0043,0.7884,0.6803,0.0076,0.7876,3,0.0176,0.0015,-0.6627
+final_minus_initial,ablation_final_minus_initial,3,0.0598,0.0022,0.1238,0.6663,0.0050,0.7869,0.6815,0.0105,0.7903,3,0.0204,0.0017,-0.6611
+B3 full_transition w/o query cond (E2 stage 1),ablation_full_transition_without_query_conditioning,3,0.1035,0.0031,0.1913,0.7706,0.0016,0.8612,0.7453,0.0115,0.8379,3,0.2345,0.0037,-0.5108
+single-stage transition model,transition_model,3,0.0987,0.0019,0.1843,0.7706,0.0014,0.8612,0.7393,0.0078,0.8329,3,0.2312,0.0054,-0.5081
+"E1 (two-stage, states only)",two_stage_token_reranker_state_only,3,0.1057,0.0057,0.1954,0.7696,0.0025,0.8603,0.7212,0.0117,0.8212,3,0.3352,0.0101,-0.3860
+"E2 (two-stage, [z, dz])",two_stage_token_reranker,3,0.1089,0.0016,0.1995,0.7806,0.0013,0.8670,0.7586,0.0113,0.8467,3,0.2367,0.0015,-0.5219

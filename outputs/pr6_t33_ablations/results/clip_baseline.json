@@ -1,0 +1,73 @@
+{
+  "command": "/home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/src/models/baselines/clip_baseline.py",
+  "encoder_name": "openai/clip-vit-base-patch32",
+  "full": {
+    "map": 0.080091692507267,
+    "mrr": 0.080091692507267,
+    "num_candidates": 12389,
+    "num_queries": 12389,
+    "recall@1": 0.04011623214141577,
+    "recall@10": 0.15594478973282752,
+    "recall@5": 0.11025910081523932
+  },
+  "hard_negative": {
+    "by_negative_type": {
+      "opposite_action": {
+        "mrr": 0.62364262342453,
+        "num_negatives": 5390,
+        "num_queries": 1688,
+        "pairwise_accuracy": 0.575139146567718,
+        "recall@1": 0.38744075829383884
+      },
+      "other_action": {
+        "mrr": 0.8265655636787415,
+        "num_negatives": 27652,
+        "num_queries": 4085,
+        "pairwise_accuracy": 0.899175466512368,
+        "recall@1": 0.7299877600979192
+      },
+      "same_objects": {
+        "mrr": 0.5127952098846436,
+        "num_negatives": 78459,
+        "num_queries": 10511,
+        "pairwise_accuracy": 0.6697638256923999,
+        "recall@1": 0.3168109599467225
+      }
+    },
+    "coverage": {
+      "negative_share_by_type": {
+        "opposite_action": 0.04834037362893606,
+        "other_action": 0.2479977758047013,
+        "same_objects": 0.7036618505663627
+      },
+      "negatives_by_type": {
+        "opposite_action": 5390,
+        "other_action": 27652,
+        "same_objects": 78459
+      },
+      "num_negatives": 111501,
+      "num_queries": 12389,
+      "queries_with_opposite_action": 1688,
+      "queries_with_opposite_action_share": 0.13624989910404392,
+      "queries_with_type": {
+        "opposite_action": 1688,
+        "other_action": 4085,
+        "same_objects": 10511
+      }
+    },
+    "map": 0.520180881023407,
+    "mrr": 0.520180881023407,
+    "num_candidates": 10,
+    "num_queries": 12389,
+    "recall@1": 0.3351360077488094,
+    "recall@10": 1.0,
+    "recall@5": 0.7633384453951085
+  },
+  "hard_negative_skipped": 0,
+  "model_name": "clip_baseline",
+  "num_frames": 16,
+  "skipped_missing_videos": 0,
+  "split": "test",
+  "timestamp": "2026-11-15T01:10:47.029333+00:00",
+  "unreadable_video_ids": []
+}

@@ -1,0 +1,102 @@
+job=7693 task=6 host=farsight gpus=5
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T23:16:51-06:00
+variant=full_transition_without_query_conditioning
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed42_best.pt (pass --retrain to train again)
+{
+  "ablation_full_transition_without_query_conditioning_seed42_reversed": {
+    "full": {
+      "recall@1": 0.02817015094035031,
+      "recall@5": 0.08790055694567761,
+      "recall@10": 0.13124545968197596,
+      "mrr": 0.06469069421291351,
+      "map": 0.06469069421291351,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.4502381144563726,
+      "recall@5": 0.8620550488336427,
+      "recall@10": 1.0,
+      "mrr": 0.6224361658096313,
+      "map": 0.6224361658096313,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.2304244661218033,
+      "recall@5": 0.6952280516741366,
+      "recall@10": 1.0,
+      "mrr": 0.4335552155971527,
+      "map": 0.4335552155971527,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed42_reversed.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed43_best.pt (pass --retrain to train again)
+{
+  "ablation_full_transition_without_query_conditioning_seed43_reversed": {
+    "full": {
+      "recall@1": 0.02695939946726935,
+      "recall@5": 0.08677052223746873,
+      "recall@10": 0.1333440955686496,
+      "mrr": 0.06369739770889282,
+      "map": 0.06369739770889282,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.45015739769150054,
+      "recall@5": 0.8706917426749536,
+      "recall@10": 1.0,
+      "mrr": 0.6246535778045654,
+      "map": 0.6246535778045654,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.23517005009227523,
+      "recall@5": 0.6915370419193251,
+      "recall@10": 1.0,
+      "mrr": 0.4352317452430725,
+      "map": 0.4352317452430725,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed43_reversed.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed44_best.pt (pass --retrain to train again)
+{
+  "ablation_full_transition_without_query_conditioning_seed44_reversed": {
+    "full": {
+      "recall@1": 0.029703769472919524,
+      "recall@5": 0.09007990959722334,
+      "recall@10": 0.13721850028250868,
+      "mrr": 0.06775470077991486,
+      "map": 0.06775470077991486,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.45395108564048753,
+      "recall@5": 0.8704495923803374,
+      "recall@10": 1.0,
+      "mrr": 0.6267478466033936,
+      "map": 0.6267478466033936,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.2378064856314263,
+      "recall@5": 0.7068283680464013,
+      "recall@10": 1.0,
+      "mrr": 0.44021672010421753,
+      "map": 0.44021672010421753,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed44_reversed.json

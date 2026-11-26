@@ -1,0 +1,105 @@
+job=7687 task=6 host=farsight gpus=6
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T17:47:30-06:00
+variant=full_transition_without_query_conditioning
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed42_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed42.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "ablation_full_transition_without_query_conditioning_seed42": {
+    "full": {
+      "recall@1": 0.10646541286625232,
+      "recall@5": 0.2695132779078215,
+      "recall@10": 0.3745257890063766,
+      "mrr": 0.19405114650726318,
+      "map": 0.19405114650726318,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7717329889418032,
+      "recall@5": 0.9807894099604488,
+      "recall@10": 1.0,
+      "mrr": 0.8614745736122131,
+      "map": 0.8614745736122131,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.7585025046137622,
+      "recall@5": 0.9659899815449512,
+      "recall@10": 1.0,
+      "mrr": 0.8462231755256653,
+      "map": 0.8462231755256653,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed42.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed43_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed43.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "ablation_full_transition_without_query_conditioning_seed43": {
+    "full": {
+      "recall@1": 0.10364032609573008,
+      "recall@5": 0.2682218096698684,
+      "recall@10": 0.37412220518201633,
+      "mrr": 0.1904742270708084,
+      "map": 0.1904742270708084,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7713294051174429,
+      "recall@5": 0.9812737105496812,
+      "recall@10": 1.0,
+      "mrr": 0.8621823787689209,
+      "map": 0.8621823787689209,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.7397838122857896,
+      "recall@5": 0.9675718428684419,
+      "recall@10": 1.0,
+      "mrr": 0.8351433277130127,
+      "map": 0.8351433277130127,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed43.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_full_transition_without_query_conditioning_seed44_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed44.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "ablation_full_transition_without_query_conditioning_seed44": {
+    "full": {
+      "recall@1": 0.10033093873597546,
+      "recall@5": 0.2696747114375656,
+      "recall@10": 0.371216401646622,
+      "mrr": 0.18945923447608948,
+      "map": 0.18945923447608948,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7688271854064089,
+      "recall@5": 0.9804665429009606,
+      "recall@10": 1.0,
+      "mrr": 0.8598700165748596,
+      "map": 0.8598700165748596,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.7376746638544688,
+      "recall@5": 0.9612443975744793,
+      "recall@10": 1.0,
+      "mrr": 0.8322014212608337,
+      "map": 0.8322014212608337,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_full_transition_without_query_conditioning_seed44.json
