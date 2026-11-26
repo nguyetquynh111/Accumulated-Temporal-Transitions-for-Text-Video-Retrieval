@@ -243,3 +243,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+/outputs/pr6_t33_ablations/checkpoints/
+/outputs/pr6_t33_ablations/logs/
