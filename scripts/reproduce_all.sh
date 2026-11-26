@@ -28,6 +28,8 @@ fi
 if step 3 "CLIP baseline (B1), V-JEPA baseline (B2), ablations, E2 stage 1"; then
   python -m src.models.baselines.clip_baseline
   python -m src.models.baselines.vjepa_baseline --variant pooled all_ablations --seeds "${SEEDS[@]}"
+  python -m src.models.baselines.vjepa_baseline --variant all_ablations --reverse-time \
+    --seeds "${SEEDS[@]}"
 fi
 
 if step 4 "single-stage transition model"; then

@@ -289,7 +289,11 @@ E2 evaluation, and reverse-time evaluation of both.
 Every runner below scores `test.jsonl`, writes metrics to
 `outputs/results/<model>.json` (`<model>_seed<seed>.json` for trained V-JEPA
 variants), and writes per-query rankings to `outputs/results/rankings_<...>.jsonl`
-for error analysis.
+for error analysis. Trained V-JEPA variants also write
+`per_query_<model>_seed<seed>.jsonl` (target rank on the full split, the
+hard-negative set, and the action-contrast set; `null` when a query is not in a
+set), the same format as the main experiment, for the T3.2 paired bootstrap
+(e.g. the main model against `ablation_no_transition`).
 
 CLIP frame averaging (B1, zero-shot; caches features in `outputs/features/clip/`):
 
@@ -302,13 +306,31 @@ retrieval model on a different view of the cached V-JEPA states with the same
 training protocol as the main model (epoch limit, early stopping, and selection
 metric from `config.py`), then evaluates it on the full split, the
 hard-negative set, and the action-contrast set. `pooled` is the V-JEPA baseline
-without transitions (B2), and `all_ablations` runs `no_transition`,
-`mean_transition`, `final_minus_initial`, and
-`full_transition_without_query_conditioning` (B3, the main model's `[z, Δz]`
-input without the reranker):
+without transitions (B2), and `all_ablations` runs the six T3.3 variants:
+
+- `no_transition`: ordered states `z[1:T]`, the matched control for the main model.
+- `transition_only`: transitions `Δz` without states.
+- `shuffled_states`: `no_transition` with the state order permuted per video;
+  redrawn on every training load (so every epoch), fixed per video id in evaluation.
+- `mean_transition` and `final_minus_initial`: one summary token each.
+- `full_transition_without_query_conditioning` (B3): the main model's `[z, Δz]`
+  input without the reranker.
 
 ```bash
 python -m src.models.baselines.vjepa_baseline --variant pooled all_ablations --seeds 42 43 44
+```
+
+A finished checkpoint is reused: it is evaluated again (writing rankings and
+per-query ranks) and its existing result JSON is kept and compared. Pass
+`--retrain` to train again and overwrite both. This matters for
+`full_transition_without_query_conditioning`, whose checkpoints are stage 1 of E2.
+
+Re-evaluate the trained checkpoints with each video's states reversed in time
+before the variant input is built (no training; writes
+`<model>_seed<seed>_reversed.json` and the matching rankings):
+
+```bash
+python -m src.models.baselines.vjepa_baseline --variant all_ablations --reverse-time --seeds 42 43 44
 ```
 
 Checkpoints are saved as `outputs/checkpoints/<model>_seed<seed>_best.pt`. To
@@ -364,14 +386,14 @@ sources `scripts/env.sh`, which activates the `attvr` Conda env (override with
 | Script | What it runs |
 |---|---|
 | `bash scripts/submit_single_stage.sh [--skip-extract]` | V-JEPA extraction, then train + evaluate for seeds 42, 43, 44 |
-| `bash scripts/submit_baselines.sh` | CLIP, every V-JEPA variant, then the comparison table |
+| `bash scripts/submit_baselines.sh` | CLIP, every V-JEPA variant, their reverse-time evaluation, then the comparison table |
 | `sbatch scripts/extract_vjepa_features.sbatch` | Sharded V-JEPA extraction (array job) |
 | `sbatch scripts/train_eval_single_stage.sbatch` | Train and evaluate one seed per array task |
 | `sbatch scripts/train_single_stage.sbatch` / `scripts/eval_single_stage.sbatch` | Train or evaluate only; extra arguments are passed through |
 | `sbatch scripts/eval_clip_baseline.sbatch` | CLIP baseline (B1) |
 | `bash scripts/submit_main_experiment.sh` | E1 stage 1 and 2 (3 seeds), E2 evaluation, reverse-time for E1 and E2 |
 | `sbatch scripts/train_token_matcher.sbatch` | Stage 2 token-level matcher; extra arguments are passed through |
-| `sbatch scripts/train_vjepa_variants.sbatch` | Array: `pooled` (B2) and the ablations; `--array=0` runs B2 only |
+| `sbatch scripts/train_vjepa_variants.sbatch` | Array: `pooled` (B2) and the six ablations, seeds 42-44; `--array=0` runs B2 only; `--reverse-time` re-evaluates |
 | `sbatch scripts/build_tables.sbatch` | Comparison table and error-analysis figures |
 | `bash scripts/reproduce_all.sh [step]` | Every step above in order on one machine (see [Reproduce all generated files](#reproduce-all-generated-files)) |
 

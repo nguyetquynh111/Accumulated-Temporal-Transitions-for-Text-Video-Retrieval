@@ -8,7 +8,12 @@ two variants the query-conditioned reranker, changes between runs:
 - pooled: mean state as one token, no reranker (B2).
 - full_transition: [z[t], z[t + 1] - z[t]] tokens with the reranker. This is the
   main model; evaluate its checkpoint with it to get comparable rankings.
-- no_transition: the raw state sequence z[1:T] instead of transitions.
+- no_transition: the raw state sequence z[1:T] instead of transitions. This is
+  the matched control for the main model.
+- transition_only: the transitions z[t + 1] - z[t] alone, without states.
+- shuffled_states: no_transition with the state order permuted per video. The
+  permutation is redrawn every time a training video is loaded (so every
+  epoch) and is fixed per video id in evaluation.
 - mean_transition: the mean transition vector as one token.
 - final_minus_initial: z[T] - z[1] as one token.
 - full_transition_without_query_conditioning: [z, dz] tokens, no reranker (B3).
@@ -16,11 +21,17 @@ two variants the query-conditioned reranker, changes between runs:
 Note that the mean of z[t + 1] - z[t] telescopes to (z[T] - z[1]) / (T - 1), and
 the model's input LayerNorm removes that scale, so mean_transition and
 final_minus_initial see the same input up to a constant factor.
+
+A finished checkpoint is evaluated instead of retrained (its result JSON is kept
+and checked); pass --retrain to train again and overwrite both.
+With --reverse-time, trained checkpoints are re-evaluated with each video's
+states reversed in time before the variant input (and its transitions) is built.
 """
 
 import argparse
 import json
 from pathlib import Path
+import zlib
 
 import numpy as np
 import torch
@@ -35,7 +46,6 @@ from config import (
     RESULT_ROOT,
     TEXT_MODEL_NAME,
 )
-from src.eval.evaluate import save_metrics
 from src.models.baselines.common import (
     build_result,
     candidate_ids,
@@ -60,6 +70,10 @@ from src.models.transition_model.pipelines.train import (
     checkpoint_path,
     fit_retrieval_model,
     log_path,
+)
+from src.models.transition_model.pipelines.train_token_reranker import (
+    per_query_records,
+    save_result,
 )
 from src.models.transition_model.retrieval import (
     TransitionRetrievalModel,
@@ -88,6 +102,8 @@ VARIANTS = {
     "pooled": False,
     "full_transition": True,
     "no_transition": True,
+    "transition_only": True,
+    "shuffled_states": True,
     "mean_transition": True,
     "final_minus_initial": True,
     "full_transition_without_query_conditioning": False,
@@ -95,6 +111,8 @@ VARIANTS = {
 STATE_TRANSITION_VARIANTS = ("full_transition", "full_transition_without_query_conditioning")
 ABLATION_VARIANTS = (
     "no_transition",
+    "transition_only",
+    "shuffled_states",
     "mean_transition",
     "final_minus_initial",
     "full_transition_without_query_conditioning",
@@ -103,6 +121,9 @@ ENCODE_BATCH_SIZE = 256
 NUM_WORKERS = 0
 TEXT_ENCODER = "minilm"
 ACTION_CONTRAST_FILE = "action_contrast.jsonl"
+# Base seed of the fixed per-video evaluation permutation of shuffled_states.
+SHUFFLE_EVAL_SEED = 0
+REVERSED_SUFFIX = "_reversed"
 
 
 # Sub functions
@@ -123,9 +144,46 @@ def variant_video_input(variant: str) -> str:
     return "state_transition" if variant in STATE_TRANSITION_VARIANTS else "transition"
 
 
+def fixed_permutation(video_id: str, length: int, seed: int = SHUFFLE_EVAL_SEED) -> np.ndarray:
+    """Return the evaluation permutation of one video's states; stable across runs."""
+    rng = np.random.default_rng([seed, zlib.crc32(str(video_id).encode("utf-8"))])
+    return rng.permutation(length)
+
+
+def prepare_states(
+    variant: str,
+    states: np.ndarray,
+    video_id: str,
+    *,
+    reverse_time: bool = False,
+    rng: np.random.Generator | None = None,
+) -> np.ndarray:
+    """Apply time reversal and, for shuffled_states, the state permutation.
+
+    With rng a fresh permutation is drawn (training); without it the fixed
+    per-video permutation is used (evaluation).
+    """
+    states = np.asarray(states, dtype=np.float32)
+    if reverse_time:
+        states = states[::-1]
+    if variant == "shuffled_states":
+        if rng is not None:
+            order = rng.permutation(len(states))
+        else:
+            order = fixed_permutation(video_id, len(states))
+        states = states[order]
+    return np.ascontiguousarray(states)
+
+
 def main_checkpoint_path(checkpoint_dir: Path = CHECKPOINT_ROOT, seed: int = RANDOM_SEED) -> Path:
     """Return the main model's best checkpoint for one seed, as pipelines.train saves it."""
     return checkpoint_path(checkpoint_dir, MAIN_RUN_NAME, seed)
+
+
+def training_finished(path: Path) -> bool:
+    """Return whether a checkpoint comes from a completed run (T2.4 stores its summary last)."""
+    _, checkpoint = load_checkpoint(path, "cpu")
+    return bool(checkpoint.get("training_summary"))
 
 
 def variant_sequence(
@@ -139,7 +197,7 @@ def variant_sequence(
         raise ValueError("state_embeddings must have shape (T, D) with T >= 2")
     if variant == "pooled":
         return states.mean(axis=0, keepdims=True)
-    if variant == "no_transition":
+    if variant in ("no_transition", "shuffled_states"):
         return states
     if variant == "final_minus_initial":
         return (states[-1] - states[0])[None]
@@ -150,15 +208,30 @@ def variant_sequence(
     )
     if variant in STATE_TRANSITION_VARIANTS:
         return np.concatenate((states[:-1], transitions), axis=1).astype(np.float32)
+    if variant == "transition_only":
+        return transitions
     if variant == "mean_transition":
         return transitions.mean(axis=0, keepdims=True)
     raise ValueError(f"unknown variant: {variant}")
 
 
 class VariantDataset(Dataset):
-    """Yield (variant sequence, label) pairs, reading feature caches lazily."""
+    """Yield (variant sequence, label) pairs, reading feature caches lazily.
 
-    def __init__(self, variant: str, video_ids: list[str], labels: list[int], feature_dir: Path):
+    shuffle_seed puts shuffled_states in training mode: a new permutation is
+    drawn on every load. Without it the fixed evaluation permutation is used.
+    """
+
+    def __init__(
+        self,
+        variant: str,
+        video_ids: list[str],
+        labels: list[int],
+        feature_dir: Path,
+        *,
+        reverse_time: bool = False,
+        shuffle_seed: int | None = None,
+    ):
         if variant not in VARIANTS:
             raise ValueError(f"unknown variant: {variant}")
         if len(video_ids) != len(labels):
@@ -167,12 +240,21 @@ class VariantDataset(Dataset):
         self.video_ids = video_ids
         self.labels = labels
         self.feature_dir = Path(feature_dir)
+        self.reverse_time = reverse_time
+        self.rng = None if shuffle_seed is None else np.random.default_rng(shuffle_seed)
 
     def __len__(self) -> int:
         return len(self.video_ids)
 
     def __getitem__(self, index: int) -> tuple[np.ndarray, int]:
-        states = load_states(self.feature_dir, self.video_ids[index])
+        video_id = self.video_ids[index]
+        states = prepare_states(
+            self.variant,
+            load_states(self.feature_dir, video_id),
+            video_id,
+            reverse_time=self.reverse_time,
+            rng=self.rng,
+        )
         return variant_sequence(self.variant, states), self.labels[index]
 
 
@@ -182,9 +264,12 @@ def encode_variant_bank(
     video_ids: list[str],
     feature_dir: Path,
     batch_size: int = ENCODE_BATCH_SIZE,
+    reverse_time: bool = False,
 ) -> np.ndarray:
     """Return encoded video representations (N, model_dim) in video_ids order."""
-    dataset = VariantDataset(variant, video_ids, list(range(len(video_ids))), feature_dir)
+    dataset = VariantDataset(
+        variant, video_ids, list(range(len(video_ids))), feature_dir, reverse_time=reverse_time
+    )
     loader = DataLoader(
         dataset, batch_size=batch_size, num_workers=NUM_WORKERS, collate_fn=collate_transitions
     )
@@ -204,10 +289,13 @@ def score_variant_rows(
     rows: list[dict],
     text_embeddings: np.ndarray,
     feature_dir: Path,
+    reverse_time: bool = False,
 ) -> tuple[np.ndarray, list[str], dict]:
     """Score every query against the split's target videos; return scores, candidates, metrics."""
     candidates = candidate_ids(rows)
-    videos = encode_variant_bank(model, variant, candidates, feature_dir)
+    videos = encode_variant_bank(
+        model, variant, candidates, feature_dir, reverse_time=reverse_time
+    )
     scores = score_transition_retrieval(text_embeddings, videos, model)
     return scores, candidates, evaluate_full(scores, rows, candidates)
 
@@ -227,6 +315,7 @@ def build_variant_loader(
         [str(row["target_video_id"]) for row in rows],
         [text_index[row["text_query"]] for row in rows],
         feature_dir,
+        shuffle_seed=seed if variant == "shuffled_states" else None,
     )
     loader = DataLoader(
         dataset,
@@ -247,8 +336,13 @@ def evaluate_candidate_file(
     rows: list[dict],
     texts: np.ndarray,
     feature_dir: Path,
+    reverse_time: bool = False,
+    ranks_out: dict[str, int] | None = None,
 ) -> tuple[dict | None, int]:
-    """Score one hard-negative-schema file; (None, 0) when it is missing or empty."""
+    """Score one hard-negative-schema file; (None, 0) when it is missing or empty.
+
+    ranks_out, if given, is filled with query_id -> target rank in that set.
+    """
     candidate_rows = read_hard_negative_rows(path, rows)
     available = {
         v for v in hard_negative_video_ids(candidate_rows) if feature_path(feature_dir, v).exists()
@@ -257,7 +351,7 @@ def evaluate_candidate_file(
     if not kept:
         return None, skipped
     video_ids = hard_negative_video_ids(kept)
-    videos = encode_variant_bank(model, variant, video_ids, feature_dir)
+    videos = encode_variant_bank(model, variant, video_ids, feature_dir, reverse_time=reverse_time)
     metrics = evaluate_hard_negatives(
         kept,
         rows,
@@ -265,6 +359,7 @@ def evaluate_candidate_file(
         video_ids,
         videos,
         lambda text, candidates: score_transition_retrieval(text, candidates, model),
+        ranks_out=ranks_out,
     )
     return metrics, skipped
 
@@ -410,18 +505,25 @@ def run_transition_ablation(
     state_embeddings: dict[str, np.ndarray],
     transition_embeddings: dict[str, np.ndarray],
     model: TransitionRetrievalModel | None = None,
+    reverse_time: bool = False,
 ) -> np.ndarray:
     """Return score matrix for one ablation variant.
 
     Candidates are the keys of state_embeddings, in order. Without a model,
     each video input is mean-pooled and dot-scored, which needs matching text
     and video dimensions; with the variant's trained model, text_embeddings are
-    raw text-encoder outputs.
+    raw text-encoder outputs. Cached transitions are ignored when the states
+    are reordered (reverse_time or shuffled_states), since they no longer match.
     """
     if variant not in VARIANTS:
         raise ValueError(f"unknown variant: {variant}")
+    reorders = reverse_time or variant == "shuffled_states"
     sequences = [
-        variant_sequence(variant, states, transition_embeddings.get(video_id))
+        variant_sequence(
+            variant,
+            prepare_states(variant, states, video_id, reverse_time=reverse_time),
+            None if reorders else transition_embeddings.get(video_id),
+        )
         for video_id, states in state_embeddings.items()
     ]
     if model is None:
@@ -442,10 +544,25 @@ def evaluate_variant(
     rankings_path: Path | None = None,
     device: str | None = None,
     limit: int | None = None,
+    reverse_time: bool = False,
+    per_query_path: Path | None = None,
+    overwrite: bool = True,
 ) -> dict:
-    """Evaluate one variant checkpoint on full, hard-negative, and action-contrast retrieval."""
+    """Evaluate one variant checkpoint on full, hard-negative, and action-contrast retrieval.
+
+    With reverse_time, every video's states are reversed before its input is built.
+    per_query_path, if given, gets one line per query with the target rank on the
+    full split, the hard-negative set, and the action-contrast set (null when the
+    query is not in that set), the format T3.2's paired bootstrap reads.
+    With overwrite=False an existing result file is kept and compared instead.
+    """
     device = get_device(device)
     model, checkpoint = load_checkpoint(checkpoint_path, device)
+    trained_variant = checkpoint.get("variant")
+    if trained_variant is not None and trained_variant != variant:
+        raise ValueError(
+            f"checkpoint was trained as variant {trained_variant!r}, which does not match {variant}"
+        )
     if checkpoint["model_config"]["query_conditioned"] != VARIANTS[variant]:
         raise ValueError(f"checkpoint reranker setting does not match variant {variant}")
     if model.video_input != variant_video_input(variant):
@@ -457,7 +574,9 @@ def evaluate_variant(
     if not rows:
         raise ValueError(f"no annotation rows with cached features in {feature_dir}")
     texts = encode_row_texts(rows, checkpoint["text_encoder"], checkpoint["text_model_name"], device)
-    scores, candidates, full = score_variant_rows(model, variant, rows, texts, feature_dir)
+    scores, candidates, full = score_variant_rows(
+        model, variant, rows, texts, feature_dir, reverse_time
+    )
 
     name = result_name(variant)
     summary = checkpoint.get("training_summary") or {}
@@ -473,18 +592,23 @@ def evaluate_variant(
         training_summary=summary or None,
         video_input=model.video_input,
         query_conditioned=VARIANTS[variant],
+        reverse_time=reverse_time,
         skipped_missing_features=skipped,
     )
+    set_ranks = {}
     for key, path in (("hard_negative", hard_negatives), ("action_contrast", action_contrast)):
+        set_ranks[key] = {}
         metrics, set_skipped = evaluate_candidate_file(
-            model, variant, path, rows, texts, feature_dir
+            model, variant, path, rows, texts, feature_dir, reverse_time, set_ranks[key]
         )
         result[key] = metrics
         result[f"{key}_skipped"] = set_skipped
 
-    save_metrics(result, output_path)
+    save_result(result, output_path, overwrite)
     if rankings_path is not None:
         save_jsonl(ranking_records(name, rows, scores, candidates), rankings_path)
+    if per_query_path is not None:
+        save_jsonl(per_query_records(rows, scores, candidates, set_ranks), per_query_path)
     return result
 
 
@@ -495,7 +619,7 @@ def main() -> None:
         nargs="+",
         choices=(*VARIANTS, "all_ablations"),
         default=["pooled"],
-        help="one or more variants; all_ablations runs the four T3.3 variants",
+        help="one or more variants; all_ablations runs the six T3.3 variants",
     )
     parser.add_argument("--train-annotations", type=Path, default=ANNOTATION_ROOT / "train.jsonl")
     parser.add_argument("--val-annotations", type=Path, default=ANNOTATION_ROOT / "val.jsonl")
@@ -539,7 +663,19 @@ def main() -> None:
         default=[RANDOM_SEED],
         help="one training run (or main checkpoint) per seed",
     )
+    parser.add_argument(
+        "--reverse-time",
+        action="store_true",
+        help="re-evaluate trained checkpoints with states reversed in time (no training)",
+    )
+    parser.add_argument(
+        "--retrain",
+        action="store_true",
+        help="train even if a checkpoint exists, overwriting it and its results",
+    )
     args = parser.parse_args()
+    if args.retrain and (args.reverse_time or args.checkpoint is not None):
+        parser.error("--retrain cannot be combined with --reverse-time or --checkpoint")
 
     variants = []
     for variant in args.variant:
@@ -551,10 +687,23 @@ def main() -> None:
     for variant in variants:
         for seed in args.seeds:
             checkpoint = args.checkpoint
+            reused = False
             if checkpoint is None and variant == "full_transition":
                 checkpoint = main_checkpoint_path(args.checkpoint_dir, seed)
                 if not checkpoint.exists():
                     parser.error(f"missing main checkpoint: {checkpoint}")
+            if checkpoint is None and not args.retrain:
+                existing = checkpoint_path(args.checkpoint_dir, result_name(variant), seed)
+                if existing.exists():
+                    if not training_finished(existing):
+                        parser.error(
+                            f"{existing} is from an unfinished run; if no job is still "
+                            "training it, pass --retrain to replace it"
+                        )
+                    print(f"Reusing {existing} (pass --retrain to train again)")
+                    checkpoint, reused = existing, True
+                elif args.reverse_time:
+                    parser.error(f"--reverse-time needs a trained checkpoint: {existing}")
             if checkpoint is None:
                 checkpoint = train_variant_model(
                     variant,
@@ -574,8 +723,11 @@ def main() -> None:
                     limit=args.limit,
                     seed=seed,
                 )
-            stem = f"{result_name(variant)}_seed{seed}"
-            output_stem = f"full_transition_seed{seed}" if variant == "full_transition" else stem
+            suffix = REVERSED_SUFFIX if args.reverse_time else ""
+            stem = f"{result_name(variant)}_seed{seed}{suffix}"
+            output_stem = (
+                f"full_transition_seed{seed}{suffix}" if variant == "full_transition" else stem
+            )
             output = args.result_dir / f"{output_stem}.json"
             result = evaluate_variant(
                 variant,
@@ -588,6 +740,9 @@ def main() -> None:
                 rankings_path=args.result_dir / f"rankings_{stem}.jsonl",
                 device=args.device,
                 limit=args.limit,
+                reverse_time=args.reverse_time,
+                per_query_path=args.result_dir / f"per_query_{stem}.jsonl",
+                overwrite=not reused,
             )
             summary = {
                 key: result[key]
