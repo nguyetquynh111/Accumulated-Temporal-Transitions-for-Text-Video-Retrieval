@@ -1,0 +1,161 @@
+job=7685 task=4 host=farsight gpus=4
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T17:47:30-06:00
+variant=mean_transition
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/ablation_mean_transition_seed42_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_mean_transition_seed42.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "ablation_mean_transition_seed42": {
+    "full": {
+      "recall@1": 0.06005327306481556,
+      "recall@5": 0.17555896359673903,
+      "recall@10": 0.25232060699007186,
+      "mrr": 0.12497690320014954,
+      "map": 0.12497690320014954,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.6695455646137702,
+      "recall@5": 0.9546371781419001,
+      "recall@10": 1.0,
+      "mrr": 0.7891309857368469,
+      "map": 0.7891309857368469,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6828368046401265,
+      "recall@5": 0.933298180859478,
+      "recall@10": 1.0,
+      "mrr": 0.7875514626502991,
+      "map": 0.7875514626502991,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_mean_transition_seed42.json
+[ablation_mean_transition] train rows: 168913 (skipped 0 without features)
+[ablation_mean_transition] val rows: 12388 (skipped 0 without features)
+[ablation_mean_transition] Epoch 1: loss=2.7579 val R@1=0.0273 MRR=0.0682
+[ablation_mean_transition] Epoch 2: loss=1.8703 val R@1=0.0386 MRR=0.0869
+[ablation_mean_transition] Epoch 3: loss=1.5827 val R@1=0.0428 MRR=0.0941
+[ablation_mean_transition] Epoch 4: loss=1.4028 val R@1=0.0465 MRR=0.1008
+[ablation_mean_transition] Epoch 5: loss=1.2745 val R@1=0.0471 MRR=0.1058
+[ablation_mean_transition] Epoch 6: loss=1.1677 val R@1=0.0504 MRR=0.1083
+[ablation_mean_transition] Epoch 7: loss=1.0808 val R@1=0.0539 MRR=0.1139
+[ablation_mean_transition] Epoch 8: loss=1.0064 val R@1=0.0540 MRR=0.1147
+[ablation_mean_transition] Epoch 9: loss=0.9412 val R@1=0.0563 MRR=0.1182
+[ablation_mean_transition] Epoch 10: loss=0.8827 val R@1=0.0567 MRR=0.1179
+[ablation_mean_transition] Epoch 11: loss=0.8318 val R@1=0.0567 MRR=0.1193
+[ablation_mean_transition] Epoch 12: loss=0.7808 val R@1=0.0582 MRR=0.1206
+[ablation_mean_transition] Epoch 13: loss=0.7391 val R@1=0.0595 MRR=0.1206
+[ablation_mean_transition] Epoch 14: loss=0.6984 val R@1=0.0579 MRR=0.1198
+[ablation_mean_transition] Epoch 15: loss=0.6645 val R@1=0.0586 MRR=0.1212
+[ablation_mean_transition] Epoch 16: loss=0.6309 val R@1=0.0588 MRR=0.1219
+[ablation_mean_transition] Epoch 17: loss=0.5966 val R@1=0.0589 MRR=0.1222
+[ablation_mean_transition] Epoch 18: loss=0.5725 val R@1=0.0600 MRR=0.1225
+[ablation_mean_transition] Epoch 19: loss=0.5442 val R@1=0.0592 MRR=0.1222
+[ablation_mean_transition] Epoch 20: loss=0.5178 val R@1=0.0587 MRR=0.1232
+[ablation_mean_transition] Epoch 21: loss=0.4922 val R@1=0.0581 MRR=0.1208
+[ablation_mean_transition] Epoch 22: loss=0.4751 val R@1=0.0596 MRR=0.1244
+[ablation_mean_transition] Epoch 23: loss=0.4553 val R@1=0.0589 MRR=0.1222
+[ablation_mean_transition] Epoch 24: loss=0.4366 val R@1=0.0592 MRR=0.1228
+[ablation_mean_transition] Epoch 25: loss=0.4226 val R@1=0.0611 MRR=0.1240
+[ablation_mean_transition] Epoch 26: loss=0.4039 val R@1=0.0617 MRR=0.1249
+[ablation_mean_transition] Epoch 27: loss=0.3922 val R@1=0.0617 MRR=0.1232
+[ablation_mean_transition] Epoch 28: loss=0.3761 val R@1=0.0609 MRR=0.1234
+[ablation_mean_transition] Epoch 29: loss=0.3640 val R@1=0.0618 MRR=0.1235
+[ablation_mean_transition] Epoch 30: loss=0.3516 val R@1=0.0615 MRR=0.1239
+[ablation_mean_transition] Epoch 31: loss=0.3446 val R@1=0.0591 MRR=0.1229
+[ablation_mean_transition] Early stop at epoch 31: no gain for 5 epochs
+[ablation_mean_transition] Best epoch 26 of 31
+{
+  "ablation_mean_transition_seed43": {
+    "full": {
+      "recall@1": 0.060779723948664134,
+      "recall@5": 0.17063524093954313,
+      "recall@10": 0.2481233352167245,
+      "mrr": 0.12252581864595413,
+      "map": 0.12252581864595413,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.66405682460247,
+      "recall@5": 0.9552829122608766,
+      "recall@10": 1.0,
+      "mrr": 0.7861453294754028,
+      "map": 0.7861453294754028,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.686264170841023,
+      "recall@5": 0.9414711310308463,
+      "recall@10": 1.0,
+      "mrr": 0.7927125692367554,
+      "map": 0.7927125692367554,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_mean_transition_seed43.json
+[ablation_mean_transition] train rows: 168913 (skipped 0 without features)
+[ablation_mean_transition] val rows: 12388 (skipped 0 without features)
+[ablation_mean_transition] Epoch 1: loss=2.7547 val R@1=0.0319 MRR=0.0712
+[ablation_mean_transition] Epoch 2: loss=1.8691 val R@1=0.0393 MRR=0.0873
+[ablation_mean_transition] Epoch 3: loss=1.5809 val R@1=0.0441 MRR=0.0965
+[ablation_mean_transition] Epoch 4: loss=1.4004 val R@1=0.0473 MRR=0.1029
+[ablation_mean_transition] Epoch 5: loss=1.2702 val R@1=0.0496 MRR=0.1059
+[ablation_mean_transition] Epoch 6: loss=1.1652 val R@1=0.0530 MRR=0.1117
+[ablation_mean_transition] Epoch 7: loss=1.0788 val R@1=0.0530 MRR=0.1136
+[ablation_mean_transition] Epoch 8: loss=1.0055 val R@1=0.0566 MRR=0.1177
+[ablation_mean_transition] Epoch 9: loss=0.9423 val R@1=0.0572 MRR=0.1184
+[ablation_mean_transition] Epoch 10: loss=0.8824 val R@1=0.0578 MRR=0.1200
+[ablation_mean_transition] Epoch 11: loss=0.8309 val R@1=0.0583 MRR=0.1216
+[ablation_mean_transition] Epoch 12: loss=0.7846 val R@1=0.0593 MRR=0.1213
+[ablation_mean_transition] Epoch 13: loss=0.7409 val R@1=0.0594 MRR=0.1227
+[ablation_mean_transition] Epoch 14: loss=0.7033 val R@1=0.0601 MRR=0.1223
+[ablation_mean_transition] Epoch 15: loss=0.6609 val R@1=0.0588 MRR=0.1225
+[ablation_mean_transition] Epoch 16: loss=0.6309 val R@1=0.0621 MRR=0.1253
+[ablation_mean_transition] Epoch 17: loss=0.5989 val R@1=0.0587 MRR=0.1222
+[ablation_mean_transition] Epoch 18: loss=0.5700 val R@1=0.0577 MRR=0.1220
+[ablation_mean_transition] Epoch 19: loss=0.5452 val R@1=0.0607 MRR=0.1243
+[ablation_mean_transition] Epoch 20: loss=0.5203 val R@1=0.0599 MRR=0.1251
+[ablation_mean_transition] Epoch 21: loss=0.4964 val R@1=0.0572 MRR=0.1212
+[ablation_mean_transition] Early stop at epoch 21: no gain for 5 epochs
+[ablation_mean_transition] Best epoch 16 of 21
+{
+  "ablation_mean_transition_seed44": {
+    "full": {
+      "recall@1": 0.056259585115828556,
+      "recall@5": 0.1698280732908225,
+      "recall@10": 0.25070627169263054,
+      "mrr": 0.11977909505367279,
+      "map": 0.11977909505367279,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.6726128016789087,
+      "recall@5": 0.9539107272580515,
+      "recall@10": 1.0,
+      "mrr": 0.7897797226905823,
+      "map": 0.7897797226905823,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6717637753756921,
+      "recall@5": 0.9317163195359873,
+      "recall@10": 1.0,
+      "mrr": 0.7825090885162354,
+      "map": 0.7825090885162354,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/ablation_mean_transition_seed44.json

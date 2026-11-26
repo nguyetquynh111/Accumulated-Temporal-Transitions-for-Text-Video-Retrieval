@@ -1,0 +1,99 @@
+job=7680 task=7 host=farsight gpus=6
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T23:16:51-06:00
+variant=full_transition
+{
+  "transition_model_seed42_reversed": {
+    "full": {
+      "recall@1": 0.025345064169828072,
+      "recall@5": 0.08023246428283154,
+      "recall@10": 0.12228589878117685,
+      "mrr": 0.060408368706703186,
+      "map": 0.060408368706703186,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.45120671563483733,
+      "recall@5": 0.8669787714908387,
+      "recall@10": 1.0,
+      "mrr": 0.6254835724830627,
+      "map": 0.6254835724830627,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.22620616925916162,
+      "recall@5": 0.6928552596889006,
+      "recall@10": 1.0,
+      "mrr": 0.43059614300727844,
+      "map": 0.43059614300727844,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/full_transition_seed42_reversed.json
+{
+  "transition_model_seed43_reversed": {
+    "full": {
+      "recall@1": 0.025345064169828072,
+      "recall@5": 0.0814432157559125,
+      "recall@10": 0.12809750585196544,
+      "mrr": 0.060549546033144,
+      "map": 0.060549546033144,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.4446686576802002,
+      "recall@5": 0.8682702397287917,
+      "recall@10": 1.0,
+      "mrr": 0.6204039454460144,
+      "map": 0.6204039454460144,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.2304244661218033,
+      "recall@5": 0.6812549433166359,
+      "recall@10": 1.0,
+      "mrr": 0.42904093861579895,
+      "map": 0.42904093861579895,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/full_transition_seed43_reversed.json
+{
+  "transition_model_seed44_reversed": {
+    "full": {
+      "recall@1": 0.026232948583420776,
+      "recall@5": 0.08208894987488902,
+      "recall@10": 0.12503026878682702,
+      "mrr": 0.061147887259721756,
+      "map": 0.061147887259721756,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.44095568649608524,
+      "recall@5": 0.8638308176608281,
+      "recall@10": 1.0,
+      "mrr": 0.6172221899032593,
+      "map": 0.6172221899032593,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.237015554969681,
+      "recall@5": 0.6997099920906934,
+      "recall@10": 1.0,
+      "mrr": 0.4358949661254883,
+      "map": 0.4358949661254883,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/full_transition_seed44_reversed.json

@@ -129,8 +129,40 @@ python -m src.models.transition_model.pipelines.report
 cd paper && latexmk -pdf main.tex
 ```
 
+<<<<<<< HEAD
 The comparison table and `report.py` read the results already in Git, so they
 run without steps 3.1–3.4.
+=======
+## Paper tables and E1 vs E2 comparison
+
+After the main experiment and the baselines have run:
+
+```bash
+python -m src.models.transition_model.pipelines.report \
+  --result-dir outputs/results outputs/pr6_t33_ablations/results
+```
+
+`--result-dir` takes one or more folders (default `outputs/results`); a file in
+a later folder replaces the same file in an earlier one. The script writes:
+
+- `e1_e2_paired_bootstrap.json` in the first folder: E2 − E1 for Recall@1 and
+  MRR in each setting. For Recall@1, each seed gets its own paired-bootstrap
+  95% CI over queries (`paired_bootstrap_recall_at_1` of the shared evaluator,
+  10,000 resamples, seed 42), and the success criterion of the PRD is met when
+  every seed's CI excludes zero on the same side.
+- `paper/generated/`: the LaTeX table bodies and `numbers.tex`, the macros
+  for every number quoted in `paper/main.tex`. If
+  `error_analysis.json` exists in one of the result folders, it also writes the
+  error-analysis subsection.
+
+The script checks that the metrics recomputed from the per-query ranks match the
+saved result files, and stops if they do not. Then compile the paper from
+`paper/` (for example `latexmk -pdf main.tex` or `tectonic main.tex`).
+`paper/figures/pipeline_standalone.tex` compiles the model diagram on its own,
+for slides.
+
+## Run on Slurm
+>>>>>>> 7db566adf0a83061c85918e3a11ffd5cb7f10719
 
 ### All steps at once
 

@@ -1,0 +1,105 @@
+job=7681 task=0 host=farsight gpus=0
+python=/home/qtnguy50/.conda/envs/attvr/bin/python started=2026-11-25T17:47:30-06:00
+variant=pooled
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/vjepa_baseline_seed42_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed42.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "vjepa_baseline_seed42": {
+    "full": {
+      "recall@1": 0.09338929695697797,
+      "recall@5": 0.24319961255952863,
+      "recall@10": 0.33675034304625073,
+      "mrr": 0.17371875047683716,
+      "map": 0.17371875047683716,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7118411494067318,
+      "recall@5": 0.968520461699895,
+      "recall@10": 1.0,
+      "mrr": 0.8201102614402771,
+      "map": 0.8201102614402771,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6134985499604535,
+      "recall@5": 0.9240706564724492,
+      "recall@10": 1.0,
+      "mrr": 0.7449463605880737,
+      "map": 0.7449463605880737,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed42.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/vjepa_baseline_seed43_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed43.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "vjepa_baseline_seed43": {
+    "full": {
+      "recall@1": 0.08983775930260715,
+      "recall@5": 0.24626684962466705,
+      "recall@10": 0.34135119864395835,
+      "mrr": 0.1726548969745636,
+      "map": 0.1726548969745636,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7036080393897812,
+      "recall@5": 0.9649689240455243,
+      "recall@10": 1.0,
+      "mrr": 0.8146557807922363,
+      "map": 0.8146557807922363,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.610071183759557,
+      "recall@5": 0.9219615080411284,
+      "recall@10": 1.0,
+      "mrr": 0.7400631904602051,
+      "map": 0.7400631904602051,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed43.json
+Reusing /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/checkpoints/vjepa_baseline_seed44_best.pt (pass --retrain to train again)
+kept /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed44.json; re-evaluation reproduced it (max |diff| = 0.00e+00)
+{
+  "vjepa_baseline_seed44": {
+    "full": {
+      "recall@1": 0.0955686496085237,
+      "recall@5": 0.24989910404390991,
+      "recall@10": 0.34264266688191136,
+      "mrr": 0.1775391399860382,
+      "map": 0.1775391399860382,
+      "num_queries": 12389,
+      "num_candidates": 12389
+    },
+    "hard_negative": {
+      "recall@1": 0.7074017273387683,
+      "recall@5": 0.9666639761078376,
+      "recall@10": 1.0,
+      "mrr": 0.8167678713798523,
+      "map": 0.8167678713798523,
+      "num_queries": 12389,
+      "num_candidates": 10
+    },
+    "action_contrast": {
+      "recall@1": 0.6092802530978118,
+      "recall@5": 0.9267070920116003,
+      "recall@10": 1.0,
+      "mrr": 0.7433416843414307,
+      "map": 0.7433416843414307,
+      "num_queries": 3793,
+      "num_candidates": 10
+    }
+  }
+}
+Saved results to /home/qtnguy50/Accumulated-Temporal-Transitions-for-Text-Video-Retrieval/outputs/pr6_t33_ablations/results/vjepa_baseline_seed44.json
