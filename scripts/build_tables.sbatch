@@ -13,7 +13,8 @@ R=outputs/results
 results=()
 for name in clip_baseline vjepa_baseline ablation_no_transition ablation_transition_only \
     ablation_shuffled_states ablation_mean_transition ablation_final_minus_initial \
-    ablation_full_transition_without_query_conditioning transition_model; do
+    ablation_full_transition_without_query_conditioning transition_model \
+    two_stage_token_reranker_state_only two_stage_token_reranker; do
   # Trained models write one <name>_seed<seed>.json per seed; CLIP writes <name>.json.
   # Reverse-time results (<name>_seed<seed>_reversed.json) are kept out of this table.
   found=("$R/$name".json "$R/$name"_seed*.json)

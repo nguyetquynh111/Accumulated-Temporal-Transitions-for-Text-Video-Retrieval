@@ -31,6 +31,9 @@ FEATURE_CACHE_KEYS = (
     "pooled_embedding",
     "encoder_name",
 )
+# Loaded encoders are reused, so repeated calls never reload model weights.
+video_encoders: dict[tuple[str, str, str | None], "VideoEncoder"] = {}
+text_encoders: dict[tuple[str, str, str | None], "TextEncoder"] = {}
 
 
 # Sub functions
@@ -303,11 +306,6 @@ class TextEncoder(PretrainedEncoder):
                 pooled = self.torch.nn.functional.normalize(pooled, p=2, dim=1)
             batches.append(pooled.float().cpu().numpy())
         return np.concatenate(batches).astype(np.float32)
-
-
-# Loaded encoders are reused, so repeated calls never reload model weights.
-video_encoders: dict[tuple[str, str, str | None], VideoEncoder] = {}
-text_encoders: dict[tuple[str, str, str | None], TextEncoder] = {}
 
 
 def get_video_encoder(

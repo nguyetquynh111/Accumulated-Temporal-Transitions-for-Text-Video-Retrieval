@@ -1,0 +1,22 @@
+label_a	label_b	videos_a	videos_b
+approaching something with your camera	moving away from something with your camera	53	50
+burying something in something	digging something out of something	19	17
+closing something	opening something	111	171
+covering something with something	uncovering something	222	154
+folding something	unfolding something	151	113
+moving something and something away from each other	moving something and something closer to each other	106	135
+moving something away from something	moving something closer to something	83	111
+moving something away from the camera	moving something towards the camera	27	42
+moving something down	moving something up	169	192
+picking something up	putting something on a surface	93	142
+pouring something into something	pouring something out of something	126	36
+pulling something from left to right	pulling something from right to left	96	65
+pulling something out of something	putting something into something	41	137
+pulling something out of something	stuffing something into something	41	160
+pushing something from left to right	pushing something from right to left	121	124
+pushing something off of something	pushing something onto something	33	22
+putting something into something	taking something out of something	137	122
+putting something similar to other things that are already on the table	taking one of many similar things on the table	160	156
+stuffing something into something	taking something out of something	160	122
+turning the camera downwards while filming something	turning the camera upwards while filming something	24	66
+turning the camera left while filming something	turning the camera right while filming something	68	75

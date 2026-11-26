@@ -26,7 +26,6 @@ from src.models.baselines.common import load_jsonl, resolve_video_row
 ERROR_CATEGORIES = (
     "correct_objects_wrong_action",
     "wrong_temporal_direction",
-    "wrong_action_ordering",
     "similar_start_end_different_motion",
     "text_ambiguity",
     "visual_ambiguity",
@@ -142,14 +141,12 @@ def categorize_error(
     if is_direction_swap(only_target, only_retrieved):
         return "wrong_temporal_direction"
     if target_actions != retrieved_actions and sorted(target_actions) == sorted(retrieved_actions):
-        # Same words in another order: "left to right" vs "right to left" is a
-        # direction swap, anything else is a reordering of the action steps.
+        # Same words in another order, such as "left to right" vs "right to left".
         swapped = {
             frozenset((a, b)) for a, b in zip(target_actions, retrieved_actions) if a != b
         }
         if swapped <= DIRECTION_PAIRS:
             return "wrong_temporal_direction"
-        return "wrong_action_ordering"
     if differing and object_tokens(target_row) & object_tokens(retrieved_row):
         return "correct_objects_wrong_action"
     if target_rank > num_candidates * ENCODER_FAILURE_FRACTION:

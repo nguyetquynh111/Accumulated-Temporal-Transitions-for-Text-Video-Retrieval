@@ -2,8 +2,9 @@ import random
 import re
 from collections import defaultdict
 
-from config import RANDOM_SEED
+from config import RANDOM_SEED, RESULT_ROOT
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -799,3 +800,15 @@ def _validate_retrieval_inputs(
         raise ValueError("scores shape must match query and candidate ids")
     if len(query_ids) != len(target_video_ids):
         raise ValueError("query_ids and target_video_ids must have the same length")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Build the model comparison CSV (T3.2).")
+    parser.add_argument("results", type=Path, nargs="+", help="result JSON files")
+    parser.add_argument("--output", type=Path, default=RESULT_ROOT / "comparison_table.csv")
+    args = parser.parse_args()
+    print(f"Saved {build_comparison_table(args.results, args.output)}")
+
+
+if __name__ == "__main__":
+    main()

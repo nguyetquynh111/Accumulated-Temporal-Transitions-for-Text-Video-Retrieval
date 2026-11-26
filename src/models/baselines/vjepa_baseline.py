@@ -725,10 +725,10 @@ def main() -> None:
                 )
             suffix = REVERSED_SUFFIX if args.reverse_time else ""
             stem = f"{result_name(variant)}_seed{seed}{suffix}"
-            output_stem = (
-                f"full_transition_seed{seed}{suffix}" if variant == "full_transition" else stem
-            )
-            output = args.result_dir / f"{output_stem}.json"
+            output = args.result_dir / f"{stem}.json"
+            # The main pipeline owns transition_model_seed<seed>.json: re-evaluating its
+            # checkpoint keeps that file and only reports whether it reproduces.
+            keep_main_result = variant == "full_transition" and not args.reverse_time
             result = evaluate_variant(
                 variant,
                 checkpoint,
@@ -742,7 +742,7 @@ def main() -> None:
                 limit=args.limit,
                 reverse_time=args.reverse_time,
                 per_query_path=args.result_dir / f"per_query_{stem}.jsonl",
-                overwrite=not reused,
+                overwrite=not (reused or keep_main_result),
             )
             summary = {
                 key: result[key]
