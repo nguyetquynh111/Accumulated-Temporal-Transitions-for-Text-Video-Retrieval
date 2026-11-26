@@ -272,7 +272,6 @@ Recommended categories:
 
 - Correct objects, wrong action
 - Correct action family, wrong temporal direction
-- Wrong ordering of states
 - Similar start/end states but different intermediate motion
 - Text ambiguity
 - Visually ambiguous clip

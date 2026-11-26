@@ -606,10 +606,6 @@
         "similar_start_end_different_motion": 36,
         "text_ambiguity": 238,
         "visual_ambiguity": 5697,
-<<<<<<< HEAD
-=======
-        "wrong_action_ordering": 0,
->>>>>>> 7db566adf0a83061c85918e3a11ffd5cb7f10719
         "wrong_temporal_direction": 162
       },
       "examples": {
@@ -1049,10 +1045,6 @@
         "similar_start_end_different_motion": 60,
         "text_ambiguity": 669,
         "visual_ambiguity": 8565,
-<<<<<<< HEAD
-=======
-        "wrong_action_ordering": 0,
->>>>>>> 7db566adf0a83061c85918e3a11ffd5cb7f10719
         "wrong_temporal_direction": 175
       },
       "examples": {
@@ -1492,10 +1484,6 @@
         "similar_start_end_different_motion": 83,
         "text_ambiguity": 692,
         "visual_ambiguity": 8395,
-<<<<<<< HEAD
-=======
-        "wrong_action_ordering": 0,
->>>>>>> 7db566adf0a83061c85918e3a11ffd5cb7f10719
         "wrong_temporal_direction": 225
       },
       "examples": {
@@ -1935,10 +1923,6 @@
         "similar_start_end_different_motion": 115,
         "text_ambiguity": 473,
         "visual_ambiguity": 8367,
-<<<<<<< HEAD
-=======
-        "wrong_action_ordering": 0,
->>>>>>> 7db566adf0a83061c85918e3a11ffd5cb7f10719
         "wrong_temporal_direction": 412
       },
       "examples": {
