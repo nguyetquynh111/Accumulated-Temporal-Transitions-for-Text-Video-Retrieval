@@ -539,8 +539,7 @@ starts from.
 \begin{table*}[!t]
 \caption{Ablations (test split, percent). Scorer: -- cosine only, $g$ pooled
 pairwise MLP, token: token-level matcher (Section~\ref{sec:matching}). Stage: 1
-single stage, 2 two-stage. Runs: number of seeds; values without $\pm$ come from
-one seed.}
+single stage, 2 two-stage. Runs: number of seeds.}
 \label{tab:ablation}
 \centering
 \begin{tabular}{lllccccc}
@@ -564,11 +563,10 @@ $z_T-z_1$. By~\eqref{eq:telescope} they differ only by the factor $1/(T-1)$,
 which the input LayerNorm removes, and they score nearly the same
 (\MeanFullMrr{} and \FmiFullMrr{} full MRR), as expected. Without the states
 they lose most of the object information: full MRR drops from
-\NtFullMrr{} (\texttt{no\_transition}) to about 12.4. Their
+\NtFullMrr{} (\texttt{no\_transition}) to about 12.3. Their
 action-contrast Recall@1 (\MeanAcRone{} and \FmiAcRone) is nevertheless above
 that of the pooled states (\BtwoAcRone), so the net change carries direction
-information that the average of the states loses. These two variants were run
-with one seed.
+information that the average of the states loses.
 
 \emph{Order of the states.} \texttt{no\_transition}, the ordered states with
 the single-stage scorer, improves on the pooled states in every setting

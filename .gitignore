@@ -208,15 +208,23 @@ tempCodeRunnerFile.py
 
 # Project-local datasets and generated artifacts.
 # Rebuild them with scripts/reproduce_all.sh (see README).
-/data/
+# SSv2 metadata and videos stay local; the generated split and candidate-set
+# annotations are tracked so everyone uses the same queries.
+/data/*
+!/data/annotations/
 /outputs/features/*
 !/outputs/features/.gitkeep
 /outputs/checkpoints/*
 !/outputs/checkpoints/.gitkeep
-# Metrics JSON and CSV in outputs/results/ are small and tracked; per-query
-# rankings (~6 MB each) are not tracked.
+# Tracked for the shared tables (T3.2, T4.2): metrics JSON and CSV in
+# outputs/results/, qualitative figures, write-ups in outputs/reports/, and the
+# E1/E2 per-query ranks used by the paired bootstrap.
+# Not tracked: full rankings (~6 MB each) and the other per-query files; rebuild
+# them with the eval commands in README.
 /outputs/results/**/rankings_*.jsonl
 /outputs/results/**/per_query_*.jsonl
+!/outputs/results/per_query_two_stage_token_reranker_seed4[234].jsonl
+!/outputs/results/per_query_two_stage_token_reranker_state_only_seed4[234].jsonl
 # Hugging Face downloads; re-downloaded on first use.
 /outputs/model_cache/
 
@@ -229,6 +237,7 @@ paper/**/*.fls
 paper/**/*.out
 paper/**/*.synctex.gz
 paper/**/*.toc
+paper/**/*.pdf
 
 # Ruff stuff:
 .ruff_cache/
@@ -243,5 +252,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-/outputs/pr6_t33_ablations/checkpoints/
-/outputs/pr6_t33_ablations/logs/
+# Slurm stdout/stderr and job ids stay local; training logs (*_train_log.jsonl) are tracked
+/logs/*.out
+/logs/*.err
+/logs/*slurm_job_ids.txt

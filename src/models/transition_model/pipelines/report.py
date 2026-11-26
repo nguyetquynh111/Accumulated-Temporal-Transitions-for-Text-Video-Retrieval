@@ -21,8 +21,7 @@ is also written to e1_e2_paired_bootstrap.json in the first --result-dir.
 Nothing is recomputed from features, and the metrics recomputed from the
 per-query ranks are checked against the saved JSON.
 
-    python -m src.models.transition_model.pipelines.report \\
-        --result-dir outputs/results outputs/pr6_t33_ablations/results
+    python -m src.models.transition_model.pipelines.report
 """
 
 import argparse
@@ -99,7 +98,6 @@ ERROR_FILE = "error_analysis.json"
 ERROR_CATEGORIES = (
     ("correct_objects_wrong_action", "Correct objects, wrong action"),
     ("wrong_temporal_direction", "Wrong temporal direction"),
-    ("wrong_action_ordering", "Wrong action ordering"),
     ("similar_start_end_different_motion", "Similar start/end, different motion"),
     ("text_ambiguity", "Text ambiguity"),
     ("visual_ambiguity", "Visual ambiguity"),
@@ -397,7 +395,7 @@ def error_section(errors: dict) -> list[list[str]] | None:
         r"\label{sec:errors}",
         r"For each query whose target is not ranked first in full retrieval, the",
         r"top-ranked wrong video is compared with the target using SSv2 templates,",
-        r"labels, and object names, and the failure is assigned to one of seven",
+        r"labels, and object names, and the failure is assigned to one of six",
         r"categories. The rules sort failures for inspection; they are heuristics, not",
         r"ground truth. Table~\ref{tab:errors} gives the share of each category.",
         r"\begin{table}[!t]",

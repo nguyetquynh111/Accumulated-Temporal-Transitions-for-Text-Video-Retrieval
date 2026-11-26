@@ -806,7 +806,9 @@ Files:
 
 Inputs:
 
-- Result JSON files from CLIP, V-JEPA, transition model, and ablations.
+- Result JSON files from CLIP, V-JEPA, E1
+  (`two_stage_token_reranker_state_only`), E2 (`two_stage_token_reranker`), the
+  single-stage transition model, and ablations.
 
 Required function:
 
@@ -830,8 +832,8 @@ Acceptance criteria:
 - Each row reports the mean and standard deviation across seeds.
 - The table has columns for each hard-negative type and for the
   action-contrast set.
-- The main comparison (transition model minus `no_transition`, action-contrast
-  Recall@1) is reported with per-seed differences and a paired-bootstrap 95%
+- The main comparison (E2 minus E1, action-contrast Recall@1; T3.1) is
+  reported with per-seed differences and a paired-bootstrap 95%
   confidence interval, resampling queries paired by `query_id`.
 - The `no_transition` row appears in every main table, not only in the
   ablation table.
@@ -933,7 +935,6 @@ Error categories:
 
 - `correct_objects_wrong_action`
 - `wrong_temporal_direction`
-- `wrong_action_ordering`
 - `similar_start_end_different_motion`
 - `text_ambiguity`
 - `visual_ambiguity`
